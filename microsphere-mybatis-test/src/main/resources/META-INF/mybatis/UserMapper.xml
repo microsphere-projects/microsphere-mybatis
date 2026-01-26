@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.microsphere.mybatis.test.mapper.UserMapper">
+    <insert id="saveUser" parameterType="User">
+        INSERT INTO users (id,name) VALUES (#{id},#{name})
+    </insert>
+
+    <select id="getUserById" resultType="User">
+        SELECT id,name FROM users WHERE id = #{id}
+    </select>
+
+    <select id="getUserByName" resultType="User" useCache="true">
+        SELECT id,name FROM users WHERE name = #{name}
+    </select>
+
+    <select id="getErrorUserByName" resultType="User">
+        SELECT id,name FROM error_users WHERE name = #{name}
+    </select>
+
+    <cache
+            eviction="FIFO"
+            flushInterval="60000"
+            size="512"
+            readOnly="true"/>
+
+</mapper>
