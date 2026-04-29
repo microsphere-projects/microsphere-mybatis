@@ -23,7 +23,7 @@
         <microsphere-spring-cloud.version>0.2.10</microsphere-spring-cloud.version>
         <!-- Libraries -->
         <mybatis.version>3.5.19</mybatis.version>
-        <mybatis-spring.version>3.0.5</mybatis-spring.version>
+        <mybatis-spring.version>4.0.0</mybatis-spring.version>
         <mybatis-spring-boot.version>3.0.5</mybatis-spring-boot.version>
     </properties>
 
