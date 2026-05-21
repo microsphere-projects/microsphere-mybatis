@@ -61,6 +61,25 @@ import static org.apache.ibatis.session.ExecutorType.SIMPLE;
  * Enables Spring's annotation-driven MyBatis capability, similar to the offical
  * <a href="https://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/#Configuration">MyBatis Spring Boot Starter</a>
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Minimal configuration – picks up the primary DataSource and Configuration beans
+ *   @EnableMyBatis
+ *   @Configuration
+ *   public class AppConfig {
+ *   }
+ *
+ *   // Explicit XML config, mapper locations and executor type
+ *   @EnableMyBatis(
+ *       configLocation = "classpath:/mybatis/config.xml",
+ *       mapperLocations = {"classpath*:/mybatis/mapper/*.xml"},
+ *       executorType = ExecutorType.REUSE
+ *   )
+ *   @Configuration
+ *   public class MyBatisConfig {
+ *   }
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see MyBatisBeanDefinitionRegistrar
  * @see MyBatisConfiguration

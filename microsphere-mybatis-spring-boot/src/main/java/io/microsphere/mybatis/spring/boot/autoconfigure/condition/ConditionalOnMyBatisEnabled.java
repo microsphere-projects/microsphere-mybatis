@@ -30,6 +30,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * The {@link ConditionalOnProperty @ConditionalOnProperty} variant for MyBatis : "microsphere.mybatis.enabled" .
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Annotate a Spring Boot auto-configuration class to make it conditional on
+ *   // the "microsphere.mybatis.enabled" property (defaults to true when absent):
+ *
+ *   @ConditionalOnMyBatisEnabled
+ *   @Configuration
+ *   public class MyBatisRelatedAutoConfiguration {
+ *       // This configuration is activated by default, or when:
+ *       // microsphere.mybatis.enabled=true
+ *   }
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see ConditionalOnProperty
  * @since 1.0.0

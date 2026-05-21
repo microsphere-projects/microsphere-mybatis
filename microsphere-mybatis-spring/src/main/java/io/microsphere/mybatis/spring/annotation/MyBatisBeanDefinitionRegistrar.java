@@ -75,6 +75,20 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 /**
  * {@link ImportBeanDefinitionRegistrar} class for {@link EnableMyBatis}
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // This registrar is triggered automatically when @EnableMyBatis is present.
+ *   // It registers SqlSessionFactory, SqlSessionTemplate, and optionally
+ *   // InterceptingExecutorInterceptor bean definitions.
+ *
+ *   @EnableMyBatis
+ *   @Configuration
+ *   public class AppConfig {
+ *       // SqlSessionFactory  bean name: "sqlSessionFactory"
+ *       // SqlSessionTemplate bean name: "sqlSessionTemplate"
+ *   }
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see EnableMyBatis
  * @see BeanCapableImportCandidate
@@ -176,6 +190,12 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         }
     }
 
+    /**
+     * Build the {@link BeanDefinition} for the {@link SqlSessionFactoryBean}.
+     *
+     * @param attributes the resolved {@link AnnotationAttributes} from {@link EnableMyBatis}
+     * @return the constructed {@link BeanDefinition}
+     */
     BeanDefinition buildSqlSessionFactoryBeanDefinition(AnnotationAttributes attributes) {
 
         checkConfigLocation(attributes);
@@ -218,6 +238,13 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         return builder.getBeanDefinition();
     }
 
+    /**
+     * Configure the {@link Configuration} or {@code configLocation} property of the
+     * {@link SqlSessionFactoryBean} builder, depending on whether a config location is specified.
+     *
+     * @param builder    the {@link BeanDefinitionBuilder} for {@link SqlSessionFactoryBean}
+     * @param attributes the resolved annotation attributes
+     */
     void setConfiguration(BeanDefinitionBuilder builder, AnnotationAttributes attributes) {
         String attributeName = "configLocation";
         String configLocation = attributes.getString(attributeName);
@@ -233,6 +260,13 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         }
     }
 
+    /**
+     * Validate the {@code configLocation} attribute when {@link EnableMyBatis#checkConfigLocation()} is
+     * {@code true}.  Throws {@link IllegalArgumentException} if the resource does not exist.
+     *
+     * @param attributes the resolved annotation attributes
+     * @throws IllegalArgumentException if the config location resource is not found
+     */
     void checkConfigLocation(AnnotationAttributes attributes) {
         boolean checkConfigLocation = attributes.getBoolean("checkConfigLocation");
         if (checkConfigLocation) {
@@ -243,6 +277,14 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         }
     }
 
+    /**
+     * Resolve the MyBatis configuration {@link Properties} from the annotation attributes, optionally
+     * merging them with the Spring {@link PropertySources} when
+     * {@link EnableMyBatis#configurationPropertiesImportPropertySources()} is {@code true}.
+     *
+     * @param attributes the resolved annotation attributes
+     * @return the merged {@link Properties}; never {@code null}
+     */
     Properties resolveConfigurationProperties(AnnotationAttributes attributes) {
         String[] configurationProperties = attributes.getStringArray("configurationProperties");
         Properties properties = new Properties();
@@ -262,6 +304,21 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         return properties;
     }
 
+    /**
+     * Convert an array of {@code "key = value"} strings into a {@link Properties} object.
+     *
+     * <h3>Example Usage</h3>
+     * <pre>{@code
+     *   Properties props = MyBatisBeanDefinitionRegistrar.stringArrayToProperties(new String[]{
+     *       "jdbc.driver = org.h2.Driver",
+     *       "jdbc.url    = jdbc:h2:mem:test"
+     *   });
+     * }</pre>
+     *
+     * @param lines an array of {@code "key=value"} strings
+     * @return a {@link Properties} populated from the given lines; never {@code null}
+     * @throws IllegalArgumentException if any line does not contain exactly one {@code =} separator
+     */
     static Properties stringArrayToProperties(String[] lines) {
         Properties properties = new Properties();
         for (String line : lines) {
@@ -274,6 +331,14 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         return properties;
     }
 
+    /**
+     * Set a package-based property value on the builder from the annotation attributes, joining
+     * multiple packages with a line separator when more than one is provided.
+     *
+     * @param builder       the {@link BeanDefinitionBuilder}
+     * @param attributes    the resolved annotation attributes
+     * @param attributeName the name of the attribute holding the package(s)
+     */
     void setPackagePropertyValue(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName) {
         String[] packages = attributes.getStringArray(attributeName);
         logger.trace("Try to set the package({}) property value by the attribute[name : '{}']", arrayToString(packages), attributeName);
@@ -297,12 +362,30 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         }
     }
 
+    /**
+     * Resolve the Spring bean name from the annotation attribute and set it as a
+     * {@link RuntimeBeanReference} property value on the builder.
+     *
+     * @param builder       the {@link BeanDefinitionBuilder}
+     * @param attributes    the resolved annotation attributes
+     * @param attributeName the name of the attribute holding the bean name (or {@code *} for primary)
+     * @param beanType      the expected type of the referenced bean, used for primary-bean lookup
+     */
     void setBeanReferencePropertyValue(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName, Class<?> beanType) {
         String beanName = attributes.getString(attributeName);
         logger.trace("Try to set the Spring Bean[{} , name : '{}'] Reference property value by the attribute[name : '{}']", beanType, beanName, attributeName);
         setBeanReferencePropertyValue(builder, attributeName, beanName, beanType);
     }
 
+    /**
+     * Resolve multiple Spring bean names from the annotation attribute and add each as a
+     * {@link RuntimeBeanReference} property value on the builder.
+     *
+     * @param builder       the {@link BeanDefinitionBuilder}
+     * @param attributes    the resolved annotation attributes
+     * @param attributeName the name of the attribute holding the bean name(s)
+     * @param beanType      the expected type of each referenced bean
+     */
     void setBeanReferencePropertyValues(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName, Class<?> beanType) {
         String[] beanNames = attributes.getStringArray(attributeName);
         logger.trace("Try to set the Spring Bean[{} , names : '{}'] Reference property values by the attribute[name : '{}']", beanType, arrayToString(beanNames), attributeName);
@@ -318,6 +401,15 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         }
     }
 
+    /**
+     * Set a {@link RuntimeBeanReference} property on the builder, resolving the primary bean when
+     * the name is the wildcard {@code *}.
+     *
+     * @param builder       the {@link BeanDefinitionBuilder}
+     * @param attributeName the property name to set
+     * @param beanName      the explicit bean name, {@code *} for primary, or blank to skip
+     * @param beanType      the type used for primary-bean lookup when the name is {@code *}
+     */
     void setBeanReferencePropertyValue(BeanDefinitionBuilder builder, String attributeName, String beanName, Class<?> beanType) {
         if (isBlank(beanName)) {
             logger.trace("No Spring Bean[{}] was speicified by the attribute[name : '{}']", beanType, attributeName);
@@ -329,10 +421,24 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         }
     }
 
+    /**
+     * Set a {@link RuntimeBeanReference} for the named bean as a property on the builder.
+     *
+     * @param builder       the {@link BeanDefinitionBuilder}
+     * @param attributeName the property name to set
+     * @param beanName      the name of the bean to reference; must not be blank
+     */
     void setBeanReferencePropertyValue(BeanDefinitionBuilder builder, String attributeName, String beanName) {
         setPropertyValue(builder, attributeName, new RuntimeBeanReference(beanName));
     }
 
+    /**
+     * Find the single bean name for the given type: returns the sole name, the primary-bean name
+     * (when multiple beans are registered), or {@code null} when none is found.
+     *
+     * @param beanType the bean type to look up
+     * @return the resolved bean name or {@code null}
+     */
     String findTargetBeanName(Class<?> beanType) {
         String[] beanNames = getBeanNamesByType(beanType);
         int length = length(beanNames);
@@ -354,11 +460,26 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         return targetBeanName;
     }
 
+    /**
+     * Retrieve all Spring bean names (including non-singleton and factory beans) of the given type.
+     *
+     * @param beanType the type to look up
+     * @return the array of bean names; never {@code null}, may be empty
+     */
     String[] getBeanNamesByType(Class<?> beanType) {
         ConfigurableListableBeanFactory beanFactory = super.getBeanFactory();
         return getBeanNames(beanFactory, beanType, true);
     }
 
+    /**
+     * Set a property value on the builder, skipping the attribute when its value equals the
+     * supplied {@code defaultValue}.
+     *
+     * @param builder       the {@link BeanDefinitionBuilder}
+     * @param attributes    the resolved annotation attributes
+     * @param attributeName the attribute (and property) name
+     * @param defaultValue  the value to compare against; when equal the property is not set
+     */
     void setPropertyValue(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName, Object defaultValue) {
         Object value = attributes.get(attributeName);
         if (Objects.equals(defaultValue, value)) {
@@ -368,11 +489,25 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         setPropertyValue(builder, attributeName, value);
     }
 
+    /**
+     * Set a property value on the builder directly from the annotation attribute value.
+     *
+     * @param builder       the {@link BeanDefinitionBuilder}
+     * @param attributes    the resolved annotation attributes
+     * @param attributeName the attribute (and property) name
+     */
     void setPropertyValue(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName) {
         Object attributeValue = attributes.get(attributeName);
         setPropertyValue(builder, attributeName, attributeValue);
     }
 
+    /**
+     * Add a property value directly to the builder.
+     *
+     * @param builder        the {@link BeanDefinitionBuilder}
+     * @param attributeName  the property name
+     * @param attributeValue the property value
+     */
     void setPropertyValue(BeanDefinitionBuilder builder, String attributeName, Object attributeValue) {
         logger.trace("Set the BeanDefinition[{}] property[name : '{}'  , value : '{}']", builder.getRawBeanDefinition(), attributeName, attributeValue);
         builder.addPropertyValue(attributeName, attributeValue);

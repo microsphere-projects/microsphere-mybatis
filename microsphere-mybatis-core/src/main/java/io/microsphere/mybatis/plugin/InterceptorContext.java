@@ -32,6 +32,24 @@ import static java.util.Collections.unmodifiableMap;
 /**
  * The Context of {@link Interceptor}
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Create a context for the intercepted Executor
+ *   Properties properties = new Properties();
+ *   properties.setProperty("timeout", "30");
+ *   InterceptorContext<Executor> context = new InterceptorContext<>(executor, properties);
+ *
+ *   // Record execution start time
+ *   context.setStartTime(System.currentTimeMillis());
+ *
+ *   // Store and retrieve custom attributes
+ *   context.setAttribute("sql", "SELECT 1");
+ *   String sql = context.getAttribute("sql"); // "SELECT 1"
+ *
+ *   // Elapsed time
+ *   long elapsed = System.currentTimeMillis() - context.getStartTime();
+ * }</pre>
+ *
  * @param <T> the type of intercepted target, e.g: {@link Executor}
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see Interceptor

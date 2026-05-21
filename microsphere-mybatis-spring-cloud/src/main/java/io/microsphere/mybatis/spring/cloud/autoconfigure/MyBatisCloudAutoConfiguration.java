@@ -45,6 +45,16 @@ import static java.util.Collections.emptyList;
 /**
  * The Auto-{@link Configuration} for MyBatis Spring Cloud
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Automatically applied by Spring Cloud when the dependency is on the classpath
+ *   // and microsphere.mybatis.enabled is true (default).
+ *   // Exposes MyBatis feature information via Spring Cloud Actuator HasFeatures.
+ *
+ *   // application.properties:
+ *   // microsphere.mybatis.enabled=true
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see Configuration
  * @see org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
@@ -57,6 +67,16 @@ import static java.util.Collections.emptyList;
 @Import(MyBatisCloudAutoConfiguration.FeaturesConfiguration.class)
 public class MyBatisCloudAutoConfiguration {
 
+    /**
+     * Inner {@link Configuration} that registers the {@link HasFeatures} bean when
+     * Spring Cloud features reporting is enabled.
+     *
+     * <h3>Example Usage</h3>
+     * <pre>{@code
+     *   // When @ConditionalOnFeaturesEnabled is satisfied, the "myBatisFeatures" bean is
+     *   // automatically created and exposed to the Spring Cloud actuator feature endpoint.
+     * }</pre>
+     */
     @ConditionalOnFeaturesEnabled
     public static class FeaturesConfiguration {
 
@@ -76,6 +96,20 @@ public class MyBatisCloudAutoConfiguration {
                 ExecutorInterceptor.class
         );
 
+        /**
+         * Create a {@link HasFeatures} bean that exposes the active MyBatis components as named features
+         * for the Spring Cloud actuator features endpoint.
+         *
+         * <h3>Example Usage</h3>
+         * <pre>{@code
+         *   // Accessed via the Spring Cloud actuator features endpoint at /actuator/features.
+         *   // Each present bean type is reported as a named feature:
+         *   //   "microsphere.mybatis.SqlSessionFactory" -> SqlSessionFactory.class
+         * }</pre>
+         *
+         * @param beanFactory the {@link ListableBeanFactory} used to check which beans are present
+         * @return a {@link HasFeatures} with one {@link NamedFeature} per present MyBatis component type
+         */
         @Bean(name = MYBATIS_FEATURES_BEAN_NAME)
         public HasFeatures mybatisFeatures(ListableBeanFactory beanFactory) {
             List<NamedFeature> namedFeatures = newArrayList(typeFeatures.size());

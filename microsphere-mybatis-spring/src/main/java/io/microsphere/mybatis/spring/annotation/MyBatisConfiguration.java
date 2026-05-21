@@ -55,6 +55,20 @@ import static org.apache.ibatis.type.JdbcType.OTHER;
  * The annotation for mybatis core modules' configuration properties, which cannot be used at the same time with the
  * {@link EnableMyBatis#configLocation()}.
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   @MyBatisConfiguration(
+ *       cacheEnabled = true,
+ *       lazyLoadingEnabled = true,
+ *       mapUnderscoreToCamelCase = true,
+ *       defaultExecutorType = ExecutorType.REUSE
+ *   )
+ *   @EnableMyBatis
+ *   @Configuration
+ *   public class AppConfig {
+ *   }
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see <a href="https://mybatis.org/mybatis-3/configuration.html">MyBatis Configuration</a>
  * @see EnableMyBatis

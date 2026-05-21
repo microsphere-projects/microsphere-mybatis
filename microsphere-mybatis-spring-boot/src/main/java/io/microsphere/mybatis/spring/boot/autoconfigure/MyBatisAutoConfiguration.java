@@ -26,6 +26,22 @@ import org.springframework.context.annotation.Configuration;
 /**
  * The Auto-{@link Configuration} for MyBatis
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Automatically applied by Spring Boot when the dependency is on the classpath.
+ *   // To disable, set the following property in application.properties:
+ *   //   microsphere.mybatis.enabled=false
+ *
+ *   // To customise, declare ExecutorFilter or ExecutorInterceptor beans:
+ *   @SpringBootApplication
+ *   public class Application {
+ *       @Bean
+ *       public LoggingExecutorFilter loggingExecutorFilter() {
+ *           return new LoggingExecutorFilter();
+ *       }
+ *   }
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see Configuration
  * @see org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration

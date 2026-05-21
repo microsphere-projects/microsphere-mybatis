@@ -42,6 +42,22 @@ import static java.lang.reflect.Proxy.getInvocationHandler;
 /**
  * The utilities class of {@link Plugin}
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Get the signature map from an @Intercepts-annotated interceptor
+ *   @Intercepts(@Signature(type = Executor.class, method = "update",
+ *       args = {MappedStatement.class, Object.class}))
+ *   class MyInterceptor implements Interceptor { ... }
+ *
+ *   Map<Class<?>, Set<Method>> signatureMap = Plugins.getSignatureMap(new MyInterceptor());
+ *   // signatureMap contains Executor.class -> {update method}
+ *
+ *   // Retrieve the Plugin from a wrapped proxy
+ *   Executor executor = new SimpleExecutor(configuration, transaction);
+ *   Object proxy = Plugin.wrap(executor, new MyInterceptor());
+ *   Plugin plugin = Plugins.getPlugin(proxy); // non-null Plugin instance
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see Plugin
  * @see Intercepts

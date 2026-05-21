@@ -45,6 +45,27 @@ import java.util.List;
  *     <li>{@link Executor#close(boolean)}</li>
  * </ul>
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   public class MetricsExecutorFilter implements ExecutorFilter {
+ *
+ *       @Override
+ *       public int update(MappedStatement ms, Object parameter, ExecutorFilterChain chain)
+ *               throws SQLException {
+ *           long start = System.currentTimeMillis();
+ *           int rows = chain.update(ms, parameter);
+ *           System.out.println("update took " + (System.currentTimeMillis() - start) + " ms");
+ *           return rows;
+ *       }
+ *   }
+ *
+ *   // Register via InterceptingExecutorInterceptor
+ *   ExecutorFilter filter = new MetricsExecutorFilter();
+ *   InterceptingExecutorInterceptor interceptor =
+ *       new InterceptingExecutorInterceptor(new ExecutorFilter[]{filter});
+ *   configuration.addInterceptor(interceptor);
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see Executor
  * @since 1.0.0

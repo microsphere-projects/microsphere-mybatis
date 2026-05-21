@@ -44,6 +44,19 @@ import static java.util.Arrays.sort;
 /**
  * {@link ExecutorFilter} Adapter based on the one or more {@link ExecutorInterceptor interceptors}
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Wrap one or more ExecutorInterceptors as a single ExecutorFilter
+ *   ExecutorInterceptor logging = new LoggingExecutorInterceptor();
+ *   InterceptorsExecutorFilterAdapter adapter =
+ *       new InterceptorsExecutorFilterAdapter(new ExecutorInterceptor[]{logging});
+ *
+ *   // Use the adapter in an InterceptingExecutorInterceptor
+ *   InterceptingExecutorInterceptor interceptor =
+ *       new InterceptingExecutorInterceptor(new ExecutorFilter[]{adapter});
+ *   configuration.addInterceptor(interceptor);
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see ExecutorInterceptor
  * @see ExecutorFilter
@@ -57,6 +70,14 @@ public class InterceptorsExecutorFilterAdapter implements ExecutorFilter {
 
     private final int executorInterceptorsCount;
 
+    /**
+     * Construct an adapter that delegates to the given {@link ExecutorInterceptor} instances.
+     * The interceptors are sorted by {@link io.microsphere.lang.Prioritized priority} after construction.
+     *
+     * @param executorInterceptors one or more {@link ExecutorInterceptor} instances; must not be empty
+     *                             and must not contain {@code null} elements
+     * @throws IllegalArgumentException if the array is empty or contains a {@code null} element
+     */
     public InterceptorsExecutorFilterAdapter(ExecutorInterceptor[] executorInterceptors) {
         assertNotEmpty(executorInterceptors, () -> "The ExecutorInterceptor array must not be empty");
         assertNoNullElements(executorInterceptors, () -> "Any element of interceptors must not be null!");

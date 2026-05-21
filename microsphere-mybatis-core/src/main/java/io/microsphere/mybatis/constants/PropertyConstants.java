@@ -27,6 +27,16 @@ import static io.microsphere.constants.SymbolConstants.DOT;
 /**
  * The constants class for MyBatis
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Check the fully-qualified property name used to enable/disable Microsphere MyBatis
+ *   String name = PropertyConstants.MICROSPHERE_MYBATIS_ENABLED_PROPERTY_NAME;
+ *   // "microsphere.mybatis.enabled"
+ *
+ *   // application.properties:
+ *   // microsphere.mybatis.enabled=true
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see ConfigurationProperty
  * @since 1.0.0

@@ -47,6 +47,31 @@ import java.util.List;
  *     <li>{@link Executor#close(boolean)}</li>
  * </ul>
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   public class AuditExecutorInterceptor implements ExecutorInterceptor {
+ *
+ *       @Override
+ *       public void beforeUpdate(InterceptorContext<Executor> context,
+ *               MappedStatement ms, Object parameter) {
+ *           System.out.println("Before update: " + ms.getId());
+ *       }
+ *
+ *       @Override
+ *       public void afterUpdate(InterceptorContext<Executor> context,
+ *               MappedStatement ms, Object parameter,
+ *               Integer result, SQLException failure) {
+ *           System.out.println("After update, affected rows: " + result);
+ *       }
+ *   }
+ *
+ *   // Register via InterceptingExecutorInterceptor
+ *   ExecutorInterceptor interceptor = new AuditExecutorInterceptor();
+ *   InterceptingExecutorInterceptor plugin =
+ *       new InterceptingExecutorInterceptor(new ExecutorFilter[0], interceptor);
+ *   configuration.addInterceptor(plugin);
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see Executor
  * @since 1.0.0

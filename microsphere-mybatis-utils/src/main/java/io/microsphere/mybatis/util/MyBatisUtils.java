@@ -42,6 +42,26 @@ import static org.apache.ibatis.io.Resources.getResourceAsReader;
 /**
  * The utility class of MyBatis.
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Load properties
+ *   Properties props = MyBatisUtils.loadProperties("META-INF/mybatis/mybatis.properties");
+ *
+ *   // Build a Configuration
+ *   Configuration configuration = MyBatisUtils.getConfiguration(
+ *       "META-INF/mybatis/config.xml", "default", props);
+ *
+ *   // Run a DDL/DML script
+ *   MyBatisUtils.runScript(MyBatisUtils.getDataSource(configuration),
+ *       "META-INF/mybatis/schema.sql");
+ *
+ *   // Execute logic inside an Executor
+ *   MyBatisUtils.doInExecutor(configuration, executor -> {
+ *       Transaction tx = executor.getTransaction();
+ *       // ... use executor
+ *   });
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
@@ -150,20 +170,47 @@ public abstract class MyBatisUtils {
         return new DefaultSqlSessionFactory(configuration);
     }
 
+    /**
+     * Open a new {@link SqlSession} from the given {@link Configuration}.
+     *
+     * @param configuration {@link Configuration}
+     * @return a new {@link SqlSession}; the caller is responsible for closing it
+     */
     public static SqlSession openSession(Configuration configuration) {
         return buildSqlSessionFactory(configuration).openSession();
     }
 
+    /**
+     * Get a {@link Connection} from the {@link SqlSession} opened for the given {@link Configuration}.
+     * <p><strong>Note:</strong> The returned connection is not automatically closed.
+     *
+     * @param configuration {@link Configuration}
+     * @return a {@link Connection} from the underlying data source
+     */
     public static Connection getConnection(Configuration configuration) {
         return openSession(configuration).getConnection();
     }
 
+    /**
+     * Create a new {@link Transaction} for the given {@link Configuration} and {@link Connection}.
+     *
+     * @param configuration {@link Configuration}
+     * @param connection    an open {@link Connection}
+     * @return a new {@link Transaction}
+     */
     public static Transaction newTransaction(Configuration configuration, Connection connection) {
         Environment environment = getEnvironment(configuration);
         TransactionFactory transactionFactory = environment.getTransactionFactory();
         return transactionFactory.newTransaction(connection);
     }
 
+    /**
+     * Create a new {@link Executor} from the given {@link Configuration} and {@link Connection}.
+     *
+     * @param configuration {@link Configuration}
+     * @param connection    an open {@link Connection}
+     * @return a new {@link Executor}
+     */
     public static Executor newExecutor(Configuration configuration, Connection connection) {
         Transaction transaction = newTransaction(configuration, connection);
         return configuration.newExecutor(transaction);

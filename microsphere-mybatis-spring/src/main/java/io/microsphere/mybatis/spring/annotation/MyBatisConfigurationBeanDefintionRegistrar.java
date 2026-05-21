@@ -39,6 +39,22 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 /**
  * The {@link ImportBeanDefinitionRegistrar} class for {@link MyBatisConfiguration}
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // @MyBatisConfiguration triggers this registrar via
+ *   // @Import(MyBatisConfigurationBeanDefintionRegistrar.class).
+ *   // It registers a MyBatis {@link Configuration} bean named "configuration".
+ *
+ *   @MyBatisConfiguration(
+ *       cacheEnabled = true,
+ *       mapUnderscoreToCamelCase = true
+ *   )
+ *   @EnableMyBatis
+ *   @Configuration
+ *   public class AppConfig {
+ *   }
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see MyBatisConfiguration
  * @see ImportBeanDefinitionRegistrar

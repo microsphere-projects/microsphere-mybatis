@@ -34,6 +34,15 @@ import static io.microsphere.logging.LoggerFactory.getLogger;
 /**
  * {@link ExecutorFilter} for Logging with debug level
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Register as a filter to log all Executor operations at debug level
+ *   ExecutorFilter loggingFilter = new LoggingExecutorFilter();
+ *   InterceptingExecutorInterceptor interceptor =
+ *       new InterceptingExecutorInterceptor(new ExecutorFilter[]{loggingFilter});
+ *   configuration.addInterceptor(interceptor);
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see ExecutorFilter
  * @since 1.0.0

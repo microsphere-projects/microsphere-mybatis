@@ -44,6 +44,18 @@ import static java.util.Collections.addAll;
 /**
  * {@link Interceptor} class for {@link Executor} delegates to {@link ExecutorInterceptor} instances
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Create an interceptor with filters and interceptors
+ *   ExecutorFilter loggingFilter = new LoggingExecutorFilter();
+ *   ExecutorInterceptor loggingInterceptor = new LoggingExecutorInterceptor();
+ *   InterceptingExecutorInterceptor interceptor =
+ *       new InterceptingExecutorInterceptor(new ExecutorFilter[]{loggingFilter}, loggingInterceptor);
+ *
+ *   // Register the interceptor as a MyBatis plugin
+ *   configuration.addInterceptor(interceptor);
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see Interceptor
  * @since 1.0.0
@@ -56,6 +68,15 @@ public class InterceptingExecutorInterceptor implements Interceptor {
 
     private Properties properties;
 
+    /**
+     * Constructor with {@link ExecutorFilter} array and optional {@link ExecutorInterceptor} instances.
+     *
+     * @param executorFilters       the array of {@link ExecutorFilter} instances; must not be empty when no
+     *                              {@code executorInterceptors} are provided
+     * @param executorInterceptors  optional {@link ExecutorInterceptor} instances; at least one filter or interceptor
+     *                              must be supplied
+     * @throws IllegalArgumentException if both arrays are empty or any element is {@code null}
+     */
     public InterceptingExecutorInterceptor(ExecutorFilter[] executorFilters, ExecutorInterceptor... executorInterceptors) {
         int executorFiltersCount = length(executorFilters);
         int executorInterceptorsCount = length(executorInterceptors);
@@ -77,12 +98,38 @@ public class InterceptingExecutorInterceptor implements Interceptor {
         this.executorFilters = allExecutorFilters;
     }
 
+    /**
+     * This method should not be called directly; it logs a warning and delegates to
+     * {@link Invocation#proceed()}.  The actual interception is performed by
+     * {@link #plugin(Object)} which wraps the {@link Executor} in an {@link InterceptingExecutor}.
+     *
+     * @param invocation the {@link Invocation}
+     * @return the result of {@link Invocation#proceed()}
+     * @throws Throwable any exception thrown by the downstream invocation
+     */
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         logger.warn("The intercept method should not be invoked : {}", invocation);
         return invocation.proceed();
     }
 
+    /**
+     * Wraps the target {@link Executor} in an {@link InterceptingExecutor} so that all registered
+     * {@link ExecutorFilter} and {@link ExecutorInterceptor} instances are applied.  Non-{@link Executor}
+     * targets are returned unchanged.
+     *
+     * <h3>Example Usage</h3>
+     * <pre>{@code
+     *   InterceptingExecutorInterceptor interceptor =
+     *       new InterceptingExecutorInterceptor(new ExecutorFilter[]{new LoggingExecutorFilter()});
+     *   configuration.addInterceptor(interceptor);
+     *   // MyBatis will call plugin(executor) automatically when opening a session
+     * }</pre>
+     *
+     * @param target the MyBatis component (e.g. {@link Executor}) to potentially wrap
+     * @return the wrapped {@link InterceptingExecutor} (or {@link CachingExecutor} wrapping it),
+     *         or {@code target} unchanged when it is not an {@link Executor}
+     */
     @Override
     public Object plugin(Object target) {
         if (target instanceof Executor executor) {
@@ -124,6 +171,12 @@ public class InterceptingExecutorInterceptor implements Interceptor {
         return target;
     }
 
+    /**
+     * Stores the given {@link Properties} so they can later be made available to filters and
+     * interceptors via {@link InterceptorContext#getProperties()}.
+     *
+     * @param properties the {@link Properties} set by the MyBatis configuration; may be {@code null}
+     */
     @Override
     public void setProperties(Properties properties) {
         this.properties = properties;

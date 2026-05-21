@@ -27,6 +27,16 @@ import static io.microsphere.reflect.FieldUtils.getFieldValue;
 /**
  * The utilities class for {@link Executor}
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Retrieve the real delegate executor from a CachingExecutor
+ *   Executor delegate = new SimpleExecutor(configuration, transaction);
+ *   CachingExecutor cachingExecutor = new CachingExecutor(delegate);
+ *
+ *   Executor retrieved = Executors.getDelegate(cachingExecutor);
+ *   // retrieved == delegate
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see Executor
  * @see CachingExecutor
@@ -36,6 +46,20 @@ public abstract class Executors {
 
     private static final Logger logger = getLogger(Executors.class);
 
+    /**
+     * Get the delegate {@link Executor} from the specified {@link CachingExecutor}.
+     *
+     * <h3>Example Usage</h3>
+     * <pre>{@code
+     *   Executor delegate = new SimpleExecutor(configuration, transaction);
+     *   CachingExecutor cachingExecutor = new CachingExecutor(delegate);
+     *   Executor retrieved = Executors.getDelegate(cachingExecutor);
+     *   // retrieved == delegate
+     * }</pre>
+     *
+     * @param cachingExecutor the {@link CachingExecutor}; must not be {@code null}
+     * @return the underlying delegate {@link Executor}
+     */
     public static Executor getDelegate(CachingExecutor cachingExecutor) {
         Executor delegate = getFieldValue(cachingExecutor, "delegate");
         logger.trace("The delegate of {} is : {}", cachingExecutor, delegate);

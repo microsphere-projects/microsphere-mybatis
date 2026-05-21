@@ -36,6 +36,15 @@ import static io.microsphere.logging.LoggerFactory.getLogger;
 /**
  * {@link InterceptingExecutor} for Logging with debug level
  *
+ * <h3>Example Usage</h3>
+ * <pre>{@code
+ *   // Register to log all Executor lifecycle callbacks at debug level
+ *   ExecutorInterceptor loggingInterceptor = new LoggingExecutorInterceptor();
+ *   InterceptingExecutorInterceptor plugin =
+ *       new InterceptingExecutorInterceptor(new ExecutorFilter[0], loggingInterceptor);
+ *   configuration.addInterceptor(plugin);
+ * }</pre>
+ *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see InterceptingExecutor
  * @since 1.0.0
