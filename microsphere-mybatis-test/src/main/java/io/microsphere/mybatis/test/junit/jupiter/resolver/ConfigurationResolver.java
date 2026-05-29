@@ -59,4 +59,3 @@ public class ConfigurationResolver extends AbstractComponentResolver<Configurati
         return testClass.getAnnotation(MyBatisTest.class);
     }
 }
-

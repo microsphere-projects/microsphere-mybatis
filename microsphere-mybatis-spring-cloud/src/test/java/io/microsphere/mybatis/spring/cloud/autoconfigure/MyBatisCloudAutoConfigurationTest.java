@@ -17,7 +17,6 @@
 
 package io.microsphere.mybatis.spring.cloud.autoconfigure;
 
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -69,4 +69,25 @@ For more details, view the commit history [here](https://example.com/commit-hist
 
 ---
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.4...0.2.5
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.4...0.2.5## v0.2.6
+
+# Release Notes for Version 0.2.6
+
+## New Features
+- **JavaDoc Updates**: Added detailed JavaDoc, including example usage, to all main source files and non-private methods. ([#53](https://github.com/microsphere-projects/pull/53))
+
+## Dependency Updates
+- Upgraded **org.mybatis:mybatis-spring** from `3.0.5` to `4.0.0`. ([#48](https://github.com/microsphere-projects/pull/48))
+- Bumped **microsphere-spring-cloud** to `0.2.12`.
+
+## Documentation
+- Updated README to reflect the latest branch names and version numbers.
+
+## Other Changes
+- Replaced `jspecify` annotations with `io.microsphere.Nullable` for consistency.
+
+---
+
+Note: This release includes no functional code changes outside documentation and dependency updates.
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.5...0.2.6

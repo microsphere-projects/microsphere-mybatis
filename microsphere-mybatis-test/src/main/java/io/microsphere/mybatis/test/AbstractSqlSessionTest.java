@@ -75,7 +75,6 @@ public abstract class AbstractSqlSessionTest extends AbstractMyBatisTest {
             // Test flushStatements
             assertNotNull(sqlSession.flushStatements());
 
-
             // Test commit
             sqlSession.commit();
             sqlSession.commit(true);

@@ -126,7 +126,6 @@ class PluginsTest {
         }
     }
 
-
     @Intercepts(
             @Signature(
                     type = Object.class,

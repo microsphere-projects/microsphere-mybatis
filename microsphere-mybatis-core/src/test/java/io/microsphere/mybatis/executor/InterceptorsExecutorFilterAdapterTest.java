@@ -17,7 +17,6 @@
 
 package io.microsphere.mybatis.executor;
 
-
 import org.junit.jupiter.api.Test;
 
 import static io.microsphere.mybatis.executor.ExecutorsTest.mockExecutor;

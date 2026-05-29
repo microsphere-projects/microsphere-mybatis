@@ -17,7 +17,6 @@
 
 package io.microsphere.mybatis.util;
 
-
 import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.Test;
 

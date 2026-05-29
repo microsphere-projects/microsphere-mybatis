@@ -17,7 +17,6 @@
 
 package io.microsphere.mybatis.spring.test.config;
 
-
 import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

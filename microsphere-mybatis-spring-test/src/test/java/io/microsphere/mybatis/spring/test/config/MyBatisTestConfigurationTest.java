@@ -17,7 +17,6 @@
 
 package io.microsphere.mybatis.spring.test.config;
 
-
 import io.microsphere.mybatis.test.mapper.ChildMapper;
 import io.microsphere.mybatis.test.mapper.FatherMapper;
 import io.microsphere.mybatis.test.mapper.UserMapper;

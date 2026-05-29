@@ -17,7 +17,6 @@
 
 package io.microsphere.mybatis.constants;
 
-
 import org.junit.jupiter.api.Test;
 
 import static io.microsphere.mybatis.constants.PropertyConstants.DEFAULT_MICROSPHERE_MYBATIS_ENABLED;

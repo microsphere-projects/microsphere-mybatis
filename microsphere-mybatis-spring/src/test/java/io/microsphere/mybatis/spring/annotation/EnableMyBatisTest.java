@@ -244,7 +244,6 @@ class EnableMyBatisTest {
     static class InvaidConfigurationPropetiesConfig {
     }
 
-
     @EnableMyBatis(
             configLocation = DEFAULT_CONFIG_RESOURCE_NAME
     )
@@ -320,7 +319,6 @@ class EnableMyBatisTest {
         }
     }
 
-
     static class HardCodeDataSourceConfiguration {
 
         @Bean(initMethod = "forceCloseAll")
@@ -353,7 +351,6 @@ class EnableMyBatisTest {
         SqlSessionFactory sqlSessionFactory = getSqlSessionFactory(context);
         Configuration configuration = sqlSessionFactory.getConfiguration();
         assertConfiguration(configuration);
-
 
         SqlSessionTemplate sqlSessionTemplate = getSqlSessionTemplate(context);
 

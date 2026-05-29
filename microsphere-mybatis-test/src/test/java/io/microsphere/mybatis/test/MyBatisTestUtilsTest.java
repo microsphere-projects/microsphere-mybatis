@@ -17,7 +17,6 @@
 
 package io.microsphere.mybatis.test;
 
-
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;

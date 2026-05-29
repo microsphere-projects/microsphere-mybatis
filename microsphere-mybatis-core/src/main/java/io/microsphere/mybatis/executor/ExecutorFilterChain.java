@@ -216,7 +216,6 @@ public class ExecutorFilterChain {
         return apply(f -> f.getTransaction(this), Executor::getTransaction);
     }
 
-
     /**
      * Execute {@link Executor#close(boolean)} through the filter chain.
      *

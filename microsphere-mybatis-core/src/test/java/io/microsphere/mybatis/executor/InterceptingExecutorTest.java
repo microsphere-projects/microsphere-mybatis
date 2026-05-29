@@ -17,7 +17,6 @@
 
 package io.microsphere.mybatis.executor;
 
-
 import org.apache.ibatis.executor.Executor;
 import org.junit.jupiter.api.Test;
 
