@@ -1,0 +1,5 @@
+io.microsphere.mybatis.executor.ExecutorFilter=\
+io.microsphere.mybatis.executor.LoggingExecutorFilter
+
+io.microsphere.mybatis.executor.ExecutorInterceptor=\
+io.microsphere.mybatis.executor.LoggingExecutorInterceptor

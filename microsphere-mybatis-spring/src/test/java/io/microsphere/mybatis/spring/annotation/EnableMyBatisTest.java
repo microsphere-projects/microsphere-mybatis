@@ -56,6 +56,9 @@ import static io.microsphere.mybatis.test.AbstractMapperTest.assertUserMapper;
 import static io.microsphere.mybatis.test.AbstractMyBatisTest.assertConfiguration;
 import static io.microsphere.mybatis.test.MyBatisTestUtils.DEFAULT_CONFIG_RESOURCE_NAME;
 import static io.microsphere.mybatis.test.MyBatisTestUtils.EMPTY_CONFIG_RESOURCE_NAME;
+import static io.microsphere.spring.beans.BeanSource.BEAN_FACTORY;
+import static io.microsphere.spring.beans.BeanSource.JAVA_SERVICE_PROVIDER;
+import static io.microsphere.spring.beans.BeanSource.SPRING_FACTORIES;
 import static io.microsphere.spring.test.util.SpringTestUtils.testInSpringContainer;
 import static io.microsphere.util.ArrayUtils.ofArray;
 import static org.apache.ibatis.session.ExecutorType.REUSE;
@@ -166,7 +169,8 @@ class EnableMyBatisTest {
             cache = "",
             plugins = {},
             typeHandlers = {""},
-            scriptingLanguageDrivers = {"", " "}
+            scriptingLanguageDrivers = {"", " "},
+            sources = BEAN_FACTORY
     )
     @Import(value = {MyBatisDataSourceTestConfiguration.class, MyBatisDataBaseTestConfiguration.class})
     static class DataSourceConfig {
@@ -185,7 +189,8 @@ class EnableMyBatisTest {
                     "",
                     " "
             },
-            interceptExecutor = false
+            interceptExecutor = false,
+            sources = SPRING_FACTORIES
     )
     @Import(value = {MyBatisDataSourceTestConfiguration.class, MyBatisDataBaseTestConfiguration.class})
     static class MapperConfig {
@@ -200,7 +205,8 @@ class EnableMyBatisTest {
             typeAliasesPackage = "io.microsphere.mybatis.test.entity",
             typeAliasesSuperType = Serializable.class,
             typeHandlersPackage = "${not-found:}",
-            executorType = REUSE
+            executorType = REUSE,
+            sources = JAVA_SERVICE_PROVIDER
     )
     @MyBatisConfiguration
     @PropertySource(value = "classpath:META-INF/mybatis/mybatis.properties")

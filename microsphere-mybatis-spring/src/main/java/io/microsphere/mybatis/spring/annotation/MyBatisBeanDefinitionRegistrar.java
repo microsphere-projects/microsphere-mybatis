@@ -20,6 +20,7 @@ package io.microsphere.mybatis.spring.annotation;
 import io.microsphere.mybatis.executor.ExecutorFilter;
 import io.microsphere.mybatis.executor.ExecutorInterceptor;
 import io.microsphere.mybatis.plugin.InterceptingExecutorInterceptor;
+import io.microsphere.spring.beans.BeanSource;
 import io.microsphere.spring.context.annotation.BeanCapableImportCandidate;
 import io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes;
 import org.apache.ibatis.cache.Cache;
@@ -43,14 +44,16 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertySources;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 
 import javax.sql.DataSource;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
@@ -60,13 +63,14 @@ import static io.microsphere.constants.SymbolConstants.WILDCARD;
 import static io.microsphere.mybatis.spring.annotation.MyBatisConfigurationBeanDefintionRegistrar.CONFIGURATION_BEAN_NAME;
 import static io.microsphere.spring.beans.BeanUtils.getBeanNames;
 import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerBeanDefinition;
-import static io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes.of;
+import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerSpringFactoriesBeans;
 import static io.microsphere.spring.core.env.PropertySourcesUtils.getPropertyNames;
 import static io.microsphere.text.FormatUtils.format;
 import static io.microsphere.util.ArrayUtils.arrayToString;
 import static io.microsphere.util.ArrayUtils.forEach;
 import static io.microsphere.util.ArrayUtils.length;
 import static io.microsphere.util.Assert.assertTrue;
+import static io.microsphere.util.ServiceLoaderUtils.getServiceClasses;
 import static io.microsphere.util.StringUtils.isBlank;
 import static io.microsphere.util.StringUtils.split;
 import static io.microsphere.util.StringUtils.trimAllWhitespace;
@@ -101,8 +105,6 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
 
     static final Class<EnableMyBatis> ANNOTATION_CLASS = EnableMyBatis.class;
 
-    static final String ANNOTATION_CLASS_NAME = ANNOTATION_CLASS.getName();
-
     /**
      * The Spring Bean name of {@link SqlSessionFactory}
      */
@@ -120,16 +122,126 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-        Map<String, Object> annotationAttributes = metadata.getAnnotationAttributes(ANNOTATION_CLASS_NAME);
-        ResolvablePlaceholderAnnotationAttributes attributes = of(annotationAttributes, ANNOTATION_CLASS, getEnvironment());
-        // Register the BeanDefintion of InterceptingExecutorInterceptor if required
-        registerInterceptingExecutorInterceptorIfRequired(attributes, registry);
+        ResolvablePlaceholderAnnotationAttributes attributes = getAnnotationAttributes(metadata, EnableMyBatis.class);
+
+        // Register the relevant BeanDefinitions of InterceptingExecutor if required
+        registeInterceptingExecutorBeansIfRequired(attributes, registry);
 
         // Register the BeanDefinition of SqlSessionFactoryBean if absent
         registerSqlSessionFactoryBeanIfAbsent(attributes, registry);
 
         // Register the BeanDefinition of SqlSessionTemplate if absent
         registerSqlSessionTemplateIfAbsent(attributes, registry);
+    }
+
+    /**
+     * Registers the relevant {@link BeanDefinition}s for the intercepting executor components
+     * if the {@link EnableMyBatis#interceptExecutor()} attribute is enabled.
+     * <p>
+     * This includes registering {@link ExecutorFilter}s and {@link ExecutorInterceptor}s
+     * from the specified sources, and conditionally registering the
+     * {@link InterceptingExecutorInterceptor} if any filters or interceptors are present.
+     *
+     * @param attributes the resolved {@link ResolvablePlaceholderAnnotationAttributes} from {@link EnableMyBatis}
+     * @param registry   the {@link BeanDefinitionRegistry} to register bean definitions with
+     */
+    private void registeInterceptingExecutorBeansIfRequired(ResolvablePlaceholderAnnotationAttributes attributes,
+                                                            BeanDefinitionRegistry registry) {
+        if (attributes.getBoolean("interceptExecutor")) {
+            BeanSource[] sources = (BeanSource[]) attributes.get("sources");
+            registerExecutorFilters(registry, sources);
+            registerExecutorInterceptors(registry, sources);
+            registerInterceptingExecutorInterceptorIfRequired(registry);
+        }
+    }
+
+    /**
+     * Registers {@link ExecutorFilter} beans from the specified {@link BeanSource}s.
+     *
+     * @param registry the {@link BeanDefinitionRegistry} to register bean definitions with
+     * @param sources  the array of {@link BeanSource}s to scan for {@link ExecutorFilter} implementations
+     */
+    private void registerExecutorFilters(BeanDefinitionRegistry registry, BeanSource[] sources) {
+        registerBeansFromSources(registry, ExecutorFilter.class, sources);
+    }
+
+    /**
+     * Registers {@link ExecutorInterceptor} beans from the specified {@link BeanSource}s.
+     *
+     * @param registry the {@link BeanDefinitionRegistry} to register bean definitions with
+     * @param sources  the array of {@link BeanSource}s to scan for {@link ExecutorInterceptor} implementations
+     */
+    private void registerExecutorInterceptors(BeanDefinitionRegistry registry, BeanSource[] sources) {
+        registerBeansFromSources(registry, ExecutorInterceptor.class, sources);
+    }
+
+    /**
+     * Registers beans of the specified type from the given {@link BeanSource}s.
+     * <p>
+     * Depending on the source type, this method will register beans via Spring Factories,
+     * Java Service Provider Interface (SPI), or expect them to be manually registered
+     * in the Bean Factory.
+     *
+     * @param registry the {@link BeanDefinitionRegistry} to register bean definitions with
+     * @param beanType the type of beans to register
+     * @param sources  the array of {@link BeanSource}s indicating where to look for bean implementations
+     */
+    private void registerBeansFromSources(BeanDefinitionRegistry registry, Class<?> beanType, BeanSource[] sources) {
+        for (BeanSource source : sources) {
+            switch (source) {
+                case SPRING_FACTORIES:
+                    registerSpringFactoriesBeans(registry, beanType);
+                case JAVA_SERVICE_PROVIDER:
+                    registerJavaServiceProviderBeans(registry, beanType);
+                case BEAN_FACTORY:
+                default:
+                    // Do nothing, the beans of ExecutorFilter or ExecutorInterceptor should be registered by users manually.
+            }
+        }
+    }
+
+    /**
+     * Registers beans of the specified type discovered via the Java Service Provider Interface (SPI).
+     * <p>
+     * This method uses {@link ServiceLoader} to find implementations of the given {@code beanType}
+     * and registers each discovered class as a bean definition in the registry.
+     *
+     * @param registry the {@link BeanDefinitionRegistry} to register bean definitions with
+     * @param beanType the interface or abstract class whose implementations are to be discovered and registered
+     */
+    private void registerJavaServiceProviderBeans(BeanDefinitionRegistry registry, Class<?> beanType) {
+        Set<? extends Class<?>> serviceClasses = getServiceClasses(beanType, this.classLoader);
+        for (Class<?> serviceClass : serviceClasses) {
+            registerBeanDefinition(registry, serviceClass);
+        }
+    }
+
+    /**
+     * Register the {@link BeanDefinition} of {@link InterceptingExecutorInterceptor} if Any {@link ExecutorFilter}  or
+     * {@link ExecutorInterceptor} bean is present.
+     *
+     * @param registry {@link BeanDefinitionRegistry}
+     * @see ExecutorFilter
+     * @see ExecutorInterceptor
+     * @see InterceptingExecutorInterceptor
+     */
+    private void registerInterceptingExecutorInterceptorIfRequired(BeanDefinitionRegistry registry) {
+        String[] executorFilterBeanNames = getBeanNamesByType(ExecutorFilter.class);
+        String[] executorInterceptorBeanNames = getBeanNamesByType(ExecutorInterceptor.class);
+        int executorFilterBeanCount = length(executorFilterBeanNames);
+        int executorInterceptorBeanCount = length(executorInterceptorBeanNames);
+        logger.trace("Found {} ExecutorFilter and {} ExecutorInterceptor BeanDefinition(s)",
+                executorFilterBeanCount, executorInterceptorBeanCount);
+        if (executorFilterBeanCount == 0 && executorInterceptorBeanCount == 0) {
+            logger.trace("No bean of ExecutorFilter or ExecutorInterceptor was found.");
+            return;
+        }
+        BeanDefinitionBuilder builder = genericBeanDefinition(InterceptingExecutorInterceptor.class);
+        forEach(executorFilterBeanNames, builder::addDependsOn);
+        forEach(executorInterceptorBeanNames, builder::addDependsOn);
+
+        BeanDefinition beanDefinition = builder.getBeanDefinition();
+        registerBeanDefinition(registry, INTERCEPTING_EXECUTOR_INTERCEPTOR_BEAN_NAME, beanDefinition);
     }
 
     /**
@@ -156,38 +268,6 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         builder.addConstructorArgValue(executorType);
         BeanDefinition beanDefinition = builder.getBeanDefinition();
         registerBeanDefinition(registry, SQL_SESSION_TEMPLATE_BEAN_NAME, beanDefinition);
-    }
-
-    /**
-     * Register the {@link BeanDefinition} of {@link SqlSessionFactoryBean} if Any {@link ExecutorFilter}  or
-     * {@link ExecutorInterceptor} bean is present.
-     *
-     * @param attributes {@link AnnotationAttributes}
-     * @param registry   {@link BeanDefinitionRegistry}
-     * @see ExecutorFilter
-     * @see ExecutorInterceptor
-     * @see InterceptingExecutorInterceptor
-     */
-    private void registerInterceptingExecutorInterceptorIfRequired(ResolvablePlaceholderAnnotationAttributes attributes,
-                                                                   BeanDefinitionRegistry registry) {
-        if (attributes.getBoolean("interceptExecutor")) {
-            String[] executorFilterBeanNames = getBeanNamesByType(ExecutorFilter.class);
-            String[] executorInterceptorBeanNames = getBeanNamesByType(ExecutorInterceptor.class);
-            int executorFilterBeanCount = length(executorFilterBeanNames);
-            int executorInterceptorBeanCount = length(executorInterceptorBeanNames);
-            logger.trace("Found {} ExecutorFilter and {} ExecutorInterceptor BeanDefinition(s)",
-                    executorFilterBeanCount, executorInterceptorBeanCount);
-            if (executorFilterBeanCount == 0 && executorInterceptorBeanCount == 0) {
-                logger.trace("No bean of ExecutorFilter or ExecutorInterceptor was found.");
-                return;
-            }
-            BeanDefinitionBuilder builder = genericBeanDefinition(InterceptingExecutorInterceptor.class);
-            forEach(executorFilterBeanNames, builder::addDependsOn);
-            forEach(executorInterceptorBeanNames, builder::addDependsOn);
-
-            BeanDefinition beanDefinition = builder.getBeanDefinition();
-            registerBeanDefinition(registry, INTERCEPTING_EXECUTOR_INTERCEPTOR_BEAN_NAME, beanDefinition);
-        }
     }
 
     /**
