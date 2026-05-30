@@ -71,10 +71,10 @@ public class InterceptingExecutorInterceptor implements Interceptor {
     /**
      * Constructor with {@link ExecutorFilter} array and optional {@link ExecutorInterceptor} instances.
      *
-     * @param executorFilters       the array of {@link ExecutorFilter} instances; must not be empty when no
-     *                              {@code executorInterceptors} are provided
-     * @param executorInterceptors  optional {@link ExecutorInterceptor} instances; at least one filter or interceptor
-     *                              must be supplied
+     * @param executorFilters      the array of {@link ExecutorFilter} instances; must not be empty when no
+     *                             {@code executorInterceptors} are provided
+     * @param executorInterceptors optional {@link ExecutorInterceptor} instances; at least one filter or interceptor
+     *                             must be supplied
      * @throws IllegalArgumentException if both arrays are empty or any element is {@code null}
      */
     public InterceptingExecutorInterceptor(ExecutorFilter[] executorFilters, ExecutorInterceptor... executorInterceptors) {
@@ -128,7 +128,7 @@ public class InterceptingExecutorInterceptor implements Interceptor {
      *
      * @param target the MyBatis component (e.g. {@link Executor}) to potentially wrap
      * @return the wrapped {@link InterceptingExecutor} (or {@link CachingExecutor} wrapping it),
-     *         or {@code target} unchanged when it is not an {@link Executor}
+     * or {@code target} unchanged when it is not an {@link Executor}
      */
     @Override
     public Object plugin(Object target) {
