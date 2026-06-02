@@ -193,22 +193,6 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
     }
 
     /**
-     * Registers beans of the specified type discovered via the Java Service Provider Interface (SPI).
-     * <p>
-     * This method uses {@link ServiceLoader} to find implementations of the given {@code beanType}
-     * and registers each discovered class as a bean definition in the registry.
-     *
-     * @param registry the {@link BeanDefinitionRegistry} to register bean definitions with
-     * @param beanType the interface or abstract class whose implementations are to be discovered and registered
-     */
-    private void registerJavaServiceProviderBeans(BeanDefinitionRegistry registry, Class<?> beanType) {
-        Set<? extends Class<?>> serviceClasses = getServiceClasses(beanType, this.classLoader);
-        for (Class<?> serviceClass : serviceClasses) {
-            registerBeanDefinition(registry, serviceClass);
-        }
-    }
-
-    /**
      * Register the {@link BeanDefinition} of {@link InterceptingExecutorInterceptor} if Any {@link ExecutorFilter}  or
      * {@link ExecutorInterceptor} bean is present.
      *

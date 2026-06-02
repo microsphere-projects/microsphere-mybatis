@@ -111,4 +111,17 @@ Note: This release includes no functional code changes outside documentation and
 - Bumped branch version references in README. [#92f9104]
 - Prepared version bump after publishing 0.2.6. [#26bf321]
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.6...0.2.7
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.6...0.2.7## v0.2.8
+
+## Release Notes - Version 0.2.8
+
+### New Features
+- **Bean Registration**: Introduced `registerBeans` for improved bean management. ([#6ddebad](https://example.com))
+
+### Dependency Updates
+- Upgraded Microsphere Spring Cloud to version **0.2.15**. ([#b459715](https://example.com))
+
+### Other Changes
+- Internal version bumps and merges to maintain release alignment. ([#c0b248f](https://example.com), [#1cb846f](https://example.com), [#2cb4549](https://example.com), [#07c6b45](https://example.com))
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.7...0.2.8
