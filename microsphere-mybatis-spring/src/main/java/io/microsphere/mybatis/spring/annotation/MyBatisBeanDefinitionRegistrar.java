@@ -50,6 +50,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -61,9 +62,9 @@ import static io.microsphere.constants.SeparatorConstants.LINE_SEPARATOR;
 import static io.microsphere.constants.SymbolConstants.EQUAL;
 import static io.microsphere.constants.SymbolConstants.WILDCARD;
 import static io.microsphere.mybatis.spring.annotation.MyBatisConfigurationBeanDefintionRegistrar.CONFIGURATION_BEAN_NAME;
+import static io.microsphere.spring.beans.BeanSource.registerBeans;
 import static io.microsphere.spring.beans.BeanUtils.getBeanNames;
 import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerBeanDefinition;
-import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerSpringFactoriesBeans;
 import static io.microsphere.spring.core.env.PropertySourcesUtils.getPropertyNames;
 import static io.microsphere.text.FormatUtils.format;
 import static io.microsphere.util.ArrayUtils.arrayToString;
@@ -187,17 +188,8 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
      * @param sources  the array of {@link BeanSource}s indicating where to look for bean implementations
      */
     private void registerBeansFromSources(BeanDefinitionRegistry registry, Class<?> beanType, BeanSource[] sources) {
-        for (BeanSource source : sources) {
-            switch (source) {
-                case SPRING_FACTORIES:
-                    registerSpringFactoriesBeans(registry, beanType);
-                case JAVA_SERVICE_PROVIDER:
-                    registerJavaServiceProviderBeans(registry, beanType);
-                case BEAN_FACTORY:
-                default:
-                    // Do nothing, the beans of ExecutorFilter or ExecutorInterceptor should be registered by users manually.
-            }
-        }
+        Map<Class<?>, String> beanTypesAndNames = registerBeans(this.beanFactory, sources, beanType);
+        logger.trace("Registered {} implementation(s) from the sources : {} : {}", beanType, sources, beanTypesAndNames);
     }
 
     /**
