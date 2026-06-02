@@ -53,8 +53,6 @@ import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
@@ -71,7 +69,6 @@ import static io.microsphere.util.ArrayUtils.arrayToString;
 import static io.microsphere.util.ArrayUtils.forEach;
 import static io.microsphere.util.ArrayUtils.length;
 import static io.microsphere.util.Assert.assertTrue;
-import static io.microsphere.util.ServiceLoaderUtils.getServiceClasses;
 import static io.microsphere.util.StringUtils.isBlank;
 import static io.microsphere.util.StringUtils.split;
 import static io.microsphere.util.StringUtils.trimAllWhitespace;
@@ -103,8 +100,6 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
  * @since 1.0.0
  */
 public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate implements ImportBeanDefinitionRegistrar {
-
-    static final Class<EnableMyBatis> ANNOTATION_CLASS = EnableMyBatis.class;
 
     /**
      * The Spring Bean name of {@link SqlSessionFactory}
@@ -150,8 +145,8 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
                                                             BeanDefinitionRegistry registry) {
         if (attributes.getBoolean("interceptExecutor")) {
             BeanSource[] sources = (BeanSource[]) attributes.get("sources");
-            registerExecutorFilters(registry, sources);
-            registerExecutorInterceptors(registry, sources);
+            registerExecutorFilters(sources);
+            registerExecutorInterceptors(sources);
             registerInterceptingExecutorInterceptorIfRequired(registry);
         }
     }
@@ -159,21 +154,19 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
     /**
      * Registers {@link ExecutorFilter} beans from the specified {@link BeanSource}s.
      *
-     * @param registry the {@link BeanDefinitionRegistry} to register bean definitions with
-     * @param sources  the array of {@link BeanSource}s to scan for {@link ExecutorFilter} implementations
+     * @param sources the array of {@link BeanSource}s to scan for {@link ExecutorFilter} implementations
      */
-    private void registerExecutorFilters(BeanDefinitionRegistry registry, BeanSource[] sources) {
-        registerBeansFromSources(registry, ExecutorFilter.class, sources);
+    private void registerExecutorFilters(BeanSource[] sources) {
+        registerBeansFromSources(ExecutorFilter.class, sources);
     }
 
     /**
      * Registers {@link ExecutorInterceptor} beans from the specified {@link BeanSource}s.
      *
-     * @param registry the {@link BeanDefinitionRegistry} to register bean definitions with
-     * @param sources  the array of {@link BeanSource}s to scan for {@link ExecutorInterceptor} implementations
+     * @param sources the array of {@link BeanSource}s to scan for {@link ExecutorInterceptor} implementations
      */
-    private void registerExecutorInterceptors(BeanDefinitionRegistry registry, BeanSource[] sources) {
-        registerBeansFromSources(registry, ExecutorInterceptor.class, sources);
+    private void registerExecutorInterceptors(BeanSource[] sources) {
+        registerBeansFromSources(ExecutorInterceptor.class, sources);
     }
 
     /**
@@ -183,11 +176,10 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
      * Java Service Provider Interface (SPI), or expect them to be manually registered
      * in the Bean Factory.
      *
-     * @param registry the {@link BeanDefinitionRegistry} to register bean definitions with
      * @param beanType the type of beans to register
      * @param sources  the array of {@link BeanSource}s indicating where to look for bean implementations
      */
-    private void registerBeansFromSources(BeanDefinitionRegistry registry, Class<?> beanType, BeanSource[] sources) {
+    private void registerBeansFromSources(Class<?> beanType, BeanSource[] sources) {
         Map<Class<?>, String> beanTypesAndNames = registerBeans(this.beanFactory, sources, beanType);
         logger.trace("Registered {} implementation(s) from the sources : {} : {}", beanType, sources, beanTypesAndNames);
     }
