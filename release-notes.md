@@ -90,4 +90,25 @@ For more details, view the commit history [here](https://example.com/commit-hist
 
 Note: This release includes no functional code changes outside documentation and dependency updates.
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.5...0.2.6
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.5...0.2.6## v0.2.7
+
+# Release Notes - Version 0.2.7
+
+## New Features
+- **BeanSource Support**: Added support for executor discovery via `BeanSource`. [#1cca2c0]
+
+## Bug Fixes
+- Fixed Javadoc formatting issues and re-indented the `Child` class. [#13979ac]
+- Removed duplicated line separators and trailing whitespace. [#71a01df]
+
+## Documentation
+- Removed outdated `zread` and `isitmaintained` badges from the README. [#b599392]
+
+## Dependency Updates
+- Upgraded Microsphere Spring Cloud version to `0.2.14`. [#7849eeb]
+
+## Other Changes
+- Bumped branch version references in README. [#92f9104]
+- Prepared version bump after publishing 0.2.6. [#26bf321]
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.6...0.2.7
