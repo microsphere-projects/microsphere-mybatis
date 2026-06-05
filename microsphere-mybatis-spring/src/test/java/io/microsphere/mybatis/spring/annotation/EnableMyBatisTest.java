@@ -18,7 +18,6 @@
 package io.microsphere.mybatis.spring.annotation;
 
 import io.microsphere.mybatis.executor.LoggingExecutorFilter;
-import io.microsphere.mybatis.executor.LoggingExecutorInterceptor;
 import io.microsphere.mybatis.plugin.InterceptingExecutorInterceptor;
 import io.microsphere.mybatis.spring.test.config.MyBatisDataBaseTestConfiguration;
 import io.microsphere.mybatis.spring.test.config.MyBatisDataSourceTestConfiguration;
@@ -56,9 +55,6 @@ import static io.microsphere.mybatis.test.AbstractMapperTest.assertUserMapper;
 import static io.microsphere.mybatis.test.AbstractMyBatisTest.assertConfiguration;
 import static io.microsphere.mybatis.test.MyBatisTestUtils.DEFAULT_CONFIG_RESOURCE_NAME;
 import static io.microsphere.mybatis.test.MyBatisTestUtils.EMPTY_CONFIG_RESOURCE_NAME;
-import static io.microsphere.spring.beans.BeanSource.BEAN_FACTORY;
-import static io.microsphere.spring.beans.BeanSource.JAVA_SERVICE_PROVIDER;
-import static io.microsphere.spring.beans.BeanSource.SPRING_FACTORIES;
 import static io.microsphere.spring.test.util.SpringTestUtils.testInSpringContainer;
 import static io.microsphere.util.ArrayUtils.ofArray;
 import static org.apache.ibatis.session.ExecutorType.REUSE;
@@ -79,12 +75,12 @@ class EnableMyBatisTest {
 
     @Test
     void testDefaultConfig() {
-        testInSpringContainer(this::assertTest, DefaultConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, DefaultConfig.class);
     }
 
     @Test
     void testSpecifiedConfig() {
-        testInSpringContainer(this::assertTest, SpecifiedConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, SpecifiedConfig.class);
     }
 
     @Test
@@ -96,19 +92,19 @@ class EnableMyBatisTest {
 
     @Test
     void testDataSourceConfig() {
-        testInSpringContainer(this::assertTest, DataSourceConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, DataSourceConfig.class);
     }
 
     @Test
     void testMapperConfig() {
-        testInSpringContainer(this::assertTest, MapperConfig.class);
-        testInSpringContainer(this::assertTest, MapperConfig2.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, MapperConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, MapperConfig2.class);
     }
 
     @Test
     void testConfigurationPropetiesConfig() {
-        testInSpringContainer(this::assertTest, ConfigurationPropetiesConfig.class);
-        testInSpringContainer(this::assertTest, ConfigurationPropetiesConfig2.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, ConfigurationPropetiesConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, ConfigurationPropetiesConfig2.class);
         assertThrows(IllegalArgumentException.class, () -> {
             new AnnotationConfigApplicationContext(InvaidConfigurationPropetiesConfig.class);
         });
@@ -116,34 +112,33 @@ class EnableMyBatisTest {
 
     @Test
     void testMultipleDataSourceConfig() {
-        testInSpringContainer(this::assertTest, MultipleDataSourceConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, MultipleDataSourceConfig.class);
     }
 
     @Test
     void testObjectWrapperFactoryConfig() {
-        testInSpringContainer(this::assertTest, ObjectWrapperFactoryConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, ObjectWrapperFactoryConfig.class);
     }
 
     @Test
     void testDatabaseIdProviderConfig() {
-        testInSpringContainer(this::assertTest, DatabaseIdProviderConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, DatabaseIdProviderConfig.class);
     }
 
     @Test
     void testCacheConfig() {
-        testInSpringContainer(this::assertTest, CacheConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, CacheConfig.class);
     }
 
     @Test
     void testPluginsConfig() {
-        testInSpringContainer(this::assertTest, PluginsConfig.class);
+        testInSpringContainer(EnableMyBatisTest::assertTest, PluginsConfig.class);
     }
 
     @EnableMyBatis
     @Import(value = {
             MyBatisDataSourceTestConfiguration.class,
-            MyBatisDataBaseTestConfiguration.class,
-            LoggingExecutorFilter.class
+            MyBatisDataBaseTestConfiguration.class
     })
     static class DefaultConfig {
     }
@@ -151,8 +146,7 @@ class EnableMyBatisTest {
     @EnableMyBatis(configLocation = DEFAULT_CONFIG_RESOURCE_NAME)
     @Import(value = {
             MyBatisDataSourceTestConfiguration.class,
-            MyBatisDataBaseTestConfiguration.class,
-            LoggingExecutorInterceptor.class
+            MyBatisDataBaseTestConfiguration.class
     })
     static class SpecifiedConfig {
     }
@@ -169,10 +163,12 @@ class EnableMyBatisTest {
             cache = "",
             plugins = {},
             typeHandlers = {""},
-            scriptingLanguageDrivers = {"", " "},
-            sources = BEAN_FACTORY
+            scriptingLanguageDrivers = {"", " "}
     )
-    @Import(value = {MyBatisDataSourceTestConfiguration.class, MyBatisDataBaseTestConfiguration.class})
+    @Import(value = {
+            MyBatisDataSourceTestConfiguration.class,
+            MyBatisDataBaseTestConfiguration.class
+    })
     static class DataSourceConfig {
     }
 
@@ -188,11 +184,12 @@ class EnableMyBatisTest {
             typeHandlersPackage = {
                     "",
                     " "
-            },
-            interceptExecutor = false,
-            sources = SPRING_FACTORIES
+            }
     )
-    @Import(value = {MyBatisDataSourceTestConfiguration.class, MyBatisDataBaseTestConfiguration.class})
+    @Import(value = {
+            MyBatisDataSourceTestConfiguration.class,
+            MyBatisDataBaseTestConfiguration.class
+    })
     static class MapperConfig {
     }
 
@@ -205,12 +202,14 @@ class EnableMyBatisTest {
             typeAliasesPackage = "io.microsphere.mybatis.test.entity",
             typeAliasesSuperType = Serializable.class,
             typeHandlersPackage = "${not-found:}",
-            executorType = REUSE,
-            sources = JAVA_SERVICE_PROVIDER
+            executorType = REUSE
     )
     @MyBatisConfiguration
     @PropertySource(value = "classpath:META-INF/mybatis/mybatis.properties")
-    @Import(value = {HardCodeDataSourceConfiguration.class, MyBatisDataBaseTestConfiguration.class})
+    @Import(value = {
+            HardCodeDataSourceConfiguration.class,
+            MyBatisDataBaseTestConfiguration.class
+    })
     static class MapperConfig2 {
     }
 
@@ -224,7 +223,10 @@ class EnableMyBatisTest {
             }
     )
     @PropertySource(value = "classpath:META-INF/mybatis/mybatis.properties")
-    @Import(value = {HardCodeDataSourceConfiguration.class, MyBatisDataBaseTestConfiguration.class})
+    @Import(value = {
+            HardCodeDataSourceConfiguration.class,
+            MyBatisDataBaseTestConfiguration.class
+    })
     static class ConfigurationPropetiesConfig {
     }
 
@@ -239,7 +241,10 @@ class EnableMyBatisTest {
             configurationPropertiesImportPropertySources = true
     )
     @PropertySource(value = "classpath:META-INF/mybatis/mybatis.properties")
-    @Import(value = {HardCodeDataSourceConfiguration.class, MyBatisDataBaseTestConfiguration.class})
+    @Import(value = {
+            HardCodeDataSourceConfiguration.class,
+            MyBatisDataBaseTestConfiguration.class
+    })
     static class ConfigurationPropetiesConfig2 {
     }
 
@@ -338,19 +343,19 @@ class EnableMyBatisTest {
         }
     }
 
-    private SqlSessionFactoryBean getSqlSessionFactoryBean(ConfigurableApplicationContext context) {
+    static SqlSessionFactoryBean getSqlSessionFactoryBean(ConfigurableApplicationContext context) {
         return context.getBean(FACTORY_BEAN_PREFIX + SQL_SESSION_FACTORY_BEAN_NAME, SqlSessionFactoryBean.class);
     }
 
-    private SqlSessionTemplate getSqlSessionTemplate(ConfigurableApplicationContext context) {
+    static SqlSessionTemplate getSqlSessionTemplate(ConfigurableApplicationContext context) {
         return context.getBean(SQL_SESSION_TEMPLATE_BEAN_NAME, SqlSessionTemplate.class);
     }
 
-    private SqlSessionFactory getSqlSessionFactory(ConfigurableApplicationContext context) {
+    static SqlSessionFactory getSqlSessionFactory(ConfigurableApplicationContext context) {
         return context.getBean(SQL_SESSION_FACTORY_BEAN_NAME, SqlSessionFactory.class);
     }
 
-    void assertTest(ConfigurableApplicationContext context) {
+    static void assertTest(ConfigurableApplicationContext context) {
         SqlSessionFactoryBean sqlSessionFactoryBean = getSqlSessionFactoryBean(context);
         assertNotNull(sqlSessionFactoryBean.getObjectType());
 

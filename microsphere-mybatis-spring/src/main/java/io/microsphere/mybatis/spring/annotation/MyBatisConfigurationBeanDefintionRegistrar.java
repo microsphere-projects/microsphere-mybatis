@@ -17,8 +17,8 @@
 
 package io.microsphere.mybatis.spring.annotation;
 
-import io.microsphere.spring.context.annotation.BeanCapableImportCandidate;
 import io.microsphere.spring.core.annotation.AnnotationUtils;
+import io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -27,12 +27,11 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
+import java.lang.annotation.Annotation;
 import java.util.Map.Entry;
 
 import static io.microsphere.collection.Sets.ofSet;
-import static io.microsphere.mybatis.spring.annotation.MyBatisBeanDefinitionRegistrar.stringArrayToProperties;
-import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerBeanDefinition;
-import static io.microsphere.util.ClassLoaderUtils.loadClass;
+import static io.microsphere.util.ClassLoaderUtils.resolveClass;
 import static io.microsphere.util.ClassUtils.newInstance;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
@@ -62,11 +61,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
  * @see Configuration
  * @since 1.0.0
  */
-public class MyBatisConfigurationBeanDefintionRegistrar extends BeanCapableImportCandidate implements ImportBeanDefinitionRegistrar {
-
-    static final Class<MyBatisConfiguration> ANNOTATION_CLASS = MyBatisConfiguration.class;
-
-    static final String ANNOTATION_CLASS_NAME = ANNOTATION_CLASS.getName();
+class MyBatisConfigurationBeanDefintionRegistrar extends MyBatisImportBeanDefinitionRegistrar<MyBatisConfiguration> {
 
     /**
      * The Spring Bean name of {@link Configuration}
@@ -74,25 +69,25 @@ public class MyBatisConfigurationBeanDefintionRegistrar extends BeanCapableImpor
     public static final String CONFIGURATION_BEAN_NAME = "configuration";
 
     @Override
-    public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-        registerConfigurationIfAbsent(metadata, registry);
+    protected void registerBeanDefinitions(AnnotationAttributes attributes, AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+        String configClassName = metadata.getClassName();
+        Class<?> configClass = resolveClass(configClassName, super.classLoader);
+        MyBatisConfiguration myBatisConfiguration = configClass.getAnnotation(super.annotationType);
+        AnnotationAttributes annotationAttributes = AnnotationUtils.getAnnotationAttributes(myBatisConfiguration, super.environment, true);
+        registerConfigurationIfAbsent(annotationAttributes, registry);
     }
 
-    private void registerConfigurationIfAbsent(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-        ClassLoader classLoader = getClassLoader();
-        String className = metadata.getClassName();
-        Class<?> targetClass = loadClass(classLoader, className);
-        MyBatisConfiguration annotation = targetClass.getAnnotation(ANNOTATION_CLASS);
-        // Only concerns the non-default attributes
-        AnnotationAttributes annotationAttributes = AnnotationUtils.getAnnotationAttributes(annotation, getEnvironment(), true);
+    private void registerConfigurationIfAbsent(AnnotationAttributes attributes, BeanDefinitionRegistry registry) {
+        registerBeanDefinitionIfAbsent(attributes, registry, CONFIGURATION_BEAN_NAME, this::buildConfigurationBeanDefinition);
+    }
 
+    BeanDefinition buildConfigurationBeanDefinition(AnnotationAttributes attributes) {
         BeanDefinitionBuilder builder = genericBeanDefinition(Configuration.class);
-
         // Those property values need to convert
         // lazyLoadTriggerMethods String[] -> Set
         // proxyFactory Class -> Object
         // variables String[] -> Properties
-        for (Entry<String, Object> entry : annotationAttributes.entrySet()) {
+        for (Entry<String, Object> entry : attributes.entrySet()) {
             String attributeName = entry.getKey();
             Object attributeValue = entry.getValue();
             if ("lazyLoadTriggerMethods".equals(attributeName)) {
@@ -107,8 +102,6 @@ public class MyBatisConfigurationBeanDefintionRegistrar extends BeanCapableImpor
             }
             builder.addPropertyValue(attributeName, attributeValue);
         }
-
-        BeanDefinition beanDefinition = builder.getBeanDefinition();
-        registerBeanDefinition(registry, CONFIGURATION_BEAN_NAME, beanDefinition);
+        return builder.getBeanDefinition();
     }
 }

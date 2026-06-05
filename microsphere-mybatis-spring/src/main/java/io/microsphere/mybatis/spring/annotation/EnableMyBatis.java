@@ -18,18 +18,11 @@
 package io.microsphere.mybatis.spring.annotation;
 
 import io.microsphere.constants.SymbolConstants;
-import io.microsphere.mybatis.executor.ExecutorFilter;
-import io.microsphere.mybatis.executor.ExecutorInterceptor;
-import io.microsphere.mybatis.executor.InterceptingExecutor;
-import io.microsphere.mybatis.plugin.InterceptingExecutorInterceptor;
-import io.microsphere.spring.beans.BeanSource;
 import io.microsphere.util.StringUtils;
 import org.apache.ibatis.cache.Cache;
-import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Plugin;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
@@ -52,9 +45,6 @@ import java.lang.annotation.Target;
 import java.util.Properties;
 
 import static io.microsphere.constants.SymbolConstants.WILDCARD;
-import static io.microsphere.spring.beans.BeanSource.BEAN_FACTORY;
-import static io.microsphere.spring.beans.BeanSource.JAVA_SERVICE_PROVIDER;
-import static io.microsphere.spring.beans.BeanSource.SPRING_FACTORIES;
 import static io.microsphere.util.StringUtils.EMPTY_STRING;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -280,26 +270,4 @@ public @interface EnableMyBatis {
      * @since MyBatis Spring 2.0.2
      */
     String[] scriptingLanguageDrivers() default WILDCARD;
-
-    /**
-     * Indicate whether the methods of MyBatis {@link Executor} should be intercepted.
-     * If <code>true</code>, {@link ExecutorFilter} and {@link ExecutorInterceptor} beans will be searched in the
-     * specified {@link #sources() scopes}, and then be applied to the MyBatis {@link InterceptingExecutor}.
-     *
-     * @see Plugin
-     * @see Executor
-     * @see ExecutorFilter
-     * @see ExecutorInterceptor
-     * @see InterceptingExecutor
-     * @see InterceptingExecutorInterceptor
-     */
-    boolean interceptExecutor() default true;
-
-    /**
-     * The sources to search the {@link ExecutorFilter} and {@link ExecutorInterceptor} beans.
-     *
-     * @return The default value is {@code {BEAN_FACTORY, SPRING_FACTORIES, JAVA_SERVICE_PROVIDER}},
-     * it indicates to search in Spring Bean Factory,  "META-INF/spring.factories" files and "META-INF/services" files.
-     */
-    BeanSource[] sources() default {BEAN_FACTORY, SPRING_FACTORIES, JAVA_SERVICE_PROVIDER};
 }

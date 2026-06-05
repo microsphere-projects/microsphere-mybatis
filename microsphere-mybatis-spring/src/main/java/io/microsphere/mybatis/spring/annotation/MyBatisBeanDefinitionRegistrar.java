@@ -17,12 +17,7 @@
 
 package io.microsphere.mybatis.spring.annotation;
 
-import io.microsphere.mybatis.executor.ExecutorFilter;
-import io.microsphere.mybatis.executor.ExecutorInterceptor;
-import io.microsphere.mybatis.plugin.InterceptingExecutorInterceptor;
-import io.microsphere.spring.beans.BeanSource;
 import io.microsphere.spring.context.annotation.BeanCapableImportCandidate;
-import io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -50,7 +45,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 
 import javax.sql.DataSource;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.StringJoiner;
@@ -60,13 +54,10 @@ import static io.microsphere.constants.SeparatorConstants.LINE_SEPARATOR;
 import static io.microsphere.constants.SymbolConstants.EQUAL;
 import static io.microsphere.constants.SymbolConstants.WILDCARD;
 import static io.microsphere.mybatis.spring.annotation.MyBatisConfigurationBeanDefintionRegistrar.CONFIGURATION_BEAN_NAME;
-import static io.microsphere.spring.beans.BeanSource.registerBeans;
 import static io.microsphere.spring.beans.BeanUtils.getBeanNames;
-import static io.microsphere.spring.beans.factory.support.BeanRegistrar.registerBeanDefinition;
 import static io.microsphere.spring.core.env.PropertySourcesUtils.getPropertyNames;
 import static io.microsphere.text.FormatUtils.format;
 import static io.microsphere.util.ArrayUtils.arrayToString;
-import static io.microsphere.util.ArrayUtils.forEach;
 import static io.microsphere.util.ArrayUtils.length;
 import static io.microsphere.util.Assert.assertTrue;
 import static io.microsphere.util.StringUtils.isBlank;
@@ -80,8 +71,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
  * <h3>Example Usage</h3>
  * <pre>{@code
  *   // This registrar is triggered automatically when @EnableMyBatis is present.
- *   // It registers SqlSessionFactory, SqlSessionTemplate, and optionally
- *   // InterceptingExecutorInterceptor bean definitions.
+ *   // It registers SqlSessionFactory, SqlSessionTemplate
  *
  *   @EnableMyBatis
  *   @Configuration
@@ -99,7 +89,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
  * @see SqlSessionTemplate
  * @since 1.0.0
  */
-public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate implements ImportBeanDefinitionRegistrar {
+public class MyBatisBeanDefinitionRegistrar extends MyBatisImportBeanDefinitionRegistrar<EnableMyBatis> {
 
     /**
      * The Spring Bean name of {@link SqlSessionFactory}
@@ -111,17 +101,8 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
      */
     public static final String SQL_SESSION_TEMPLATE_BEAN_NAME = "sqlSessionTemplate";
 
-    /**
-     * The Spring Bean name of {@link InterceptingExecutorInterceptor}
-     */
-    public static final String INTERCEPTING_EXECUTOR_INTERCEPTOR_BEAN_NAME = "interceptingExecutorInterceptor";
-
     @Override
-    public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-        ResolvablePlaceholderAnnotationAttributes attributes = getAnnotationAttributes(metadata, EnableMyBatis.class);
-
-        // Register the relevant BeanDefinitions of InterceptingExecutor if required
-        registeInterceptingExecutorBeansIfRequired(attributes, registry);
+    protected void registerBeanDefinitions(AnnotationAttributes attributes, AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
 
         // Register the BeanDefinition of SqlSessionFactoryBean if absent
         registerSqlSessionFactoryBeanIfAbsent(attributes, registry);
@@ -131,96 +112,13 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
     }
 
     /**
-     * Registers the relevant {@link BeanDefinition}s for the intercepting executor components
-     * if the {@link EnableMyBatis#interceptExecutor()} attribute is enabled.
-     * <p>
-     * This includes registering {@link ExecutorFilter}s and {@link ExecutorInterceptor}s
-     * from the specified sources, and conditionally registering the
-     * {@link InterceptingExecutorInterceptor} if any filters or interceptors are present.
-     *
-     * @param attributes the resolved {@link ResolvablePlaceholderAnnotationAttributes} from {@link EnableMyBatis}
-     * @param registry   the {@link BeanDefinitionRegistry} to register bean definitions with
-     */
-    private void registeInterceptingExecutorBeansIfRequired(ResolvablePlaceholderAnnotationAttributes attributes,
-                                                            BeanDefinitionRegistry registry) {
-        if (attributes.getBoolean("interceptExecutor")) {
-            BeanSource[] sources = (BeanSource[]) attributes.get("sources");
-            registerExecutorFilters(sources);
-            registerExecutorInterceptors(sources);
-            registerInterceptingExecutorInterceptorIfRequired(registry);
-        }
-    }
-
-    /**
-     * Registers {@link ExecutorFilter} beans from the specified {@link BeanSource}s.
-     *
-     * @param sources the array of {@link BeanSource}s to scan for {@link ExecutorFilter} implementations
-     */
-    private void registerExecutorFilters(BeanSource[] sources) {
-        registerBeansFromSources(ExecutorFilter.class, sources);
-    }
-
-    /**
-     * Registers {@link ExecutorInterceptor} beans from the specified {@link BeanSource}s.
-     *
-     * @param sources the array of {@link BeanSource}s to scan for {@link ExecutorInterceptor} implementations
-     */
-    private void registerExecutorInterceptors(BeanSource[] sources) {
-        registerBeansFromSources(ExecutorInterceptor.class, sources);
-    }
-
-    /**
-     * Registers beans of the specified type from the given {@link BeanSource}s.
-     * <p>
-     * Depending on the source type, this method will register beans via Spring Factories,
-     * Java Service Provider Interface (SPI), or expect them to be manually registered
-     * in the Bean Factory.
-     *
-     * @param beanType the type of beans to register
-     * @param sources  the array of {@link BeanSource}s indicating where to look for bean implementations
-     */
-    private void registerBeansFromSources(Class<?> beanType, BeanSource[] sources) {
-        Map<Class<?>, String> beanTypesAndNames = registerBeans(this.beanFactory, sources, beanType);
-        logger.trace("Registered {} implementation(s) from the sources : {} : {}", beanType, sources, beanTypesAndNames);
-    }
-
-    /**
-     * Register the {@link BeanDefinition} of {@link InterceptingExecutorInterceptor} if Any {@link ExecutorFilter}  or
-     * {@link ExecutorInterceptor} bean is present.
-     *
-     * @param registry {@link BeanDefinitionRegistry}
-     * @see ExecutorFilter
-     * @see ExecutorInterceptor
-     * @see InterceptingExecutorInterceptor
-     */
-    private void registerInterceptingExecutorInterceptorIfRequired(BeanDefinitionRegistry registry) {
-        String[] executorFilterBeanNames = getBeanNamesByType(ExecutorFilter.class);
-        String[] executorInterceptorBeanNames = getBeanNamesByType(ExecutorInterceptor.class);
-        int executorFilterBeanCount = length(executorFilterBeanNames);
-        int executorInterceptorBeanCount = length(executorInterceptorBeanNames);
-        logger.trace("Found {} ExecutorFilter and {} ExecutorInterceptor BeanDefinition(s)",
-                executorFilterBeanCount, executorInterceptorBeanCount);
-        if (executorFilterBeanCount == 0 && executorInterceptorBeanCount == 0) {
-            logger.trace("No bean of ExecutorFilter or ExecutorInterceptor was found.");
-            return;
-        }
-        BeanDefinitionBuilder builder = genericBeanDefinition(InterceptingExecutorInterceptor.class);
-        forEach(executorFilterBeanNames, builder::addDependsOn);
-        forEach(executorInterceptorBeanNames, builder::addDependsOn);
-
-        BeanDefinition beanDefinition = builder.getBeanDefinition();
-        registerBeanDefinition(registry, INTERCEPTING_EXECUTOR_INTERCEPTOR_BEAN_NAME, beanDefinition);
-    }
-
-    /**
      * Register the {@link BeanDefinition} of {@link SqlSessionFactoryBean} if absent
      *
      * @param attributes {@link AnnotationAttributes}
      * @param registry   {@link BeanDefinitionRegistry}
      */
     void registerSqlSessionFactoryBeanIfAbsent(AnnotationAttributes attributes, BeanDefinitionRegistry registry) {
-        BeanDefinition beanDefinition = buildSqlSessionFactoryBeanDefinition(attributes);
-        registerBeanDefinition(registry, SQL_SESSION_FACTORY_BEAN_NAME, beanDefinition);
+        registerBeanDefinitionIfAbsent(attributes, registry, SQL_SESSION_FACTORY_BEAN_NAME, this::buildSqlSessionFactoryBeanDefinition);
     }
 
     /**
@@ -230,12 +128,7 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
      * @param registry   {@link BeanDefinitionRegistry}
      */
     void registerSqlSessionTemplateIfAbsent(AnnotationAttributes attributes, BeanDefinitionRegistry registry) {
-        BeanDefinitionBuilder builder = genericBeanDefinition(SqlSessionTemplate.class);
-        ExecutorType executorType = attributes.getEnum("executorType");
-        builder.addConstructorArgReference(SQL_SESSION_FACTORY_BEAN_NAME);
-        builder.addConstructorArgValue(executorType);
-        BeanDefinition beanDefinition = builder.getBeanDefinition();
-        registerBeanDefinition(registry, SQL_SESSION_TEMPLATE_BEAN_NAME, beanDefinition);
+        registerBeanDefinitionIfAbsent(attributes, registry, SQL_SESSION_TEMPLATE_BEAN_NAME, this::buildSqlSessionTemplateBeanDefinition);
     }
 
     /**
@@ -283,6 +176,14 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         // References the LanguageDriver Beans
         setBeanReferencePropertyValues(builder, attributes, "scriptingLanguageDrivers", LanguageDriver.class);
 
+        return builder.getBeanDefinition();
+    }
+
+    BeanDefinition buildSqlSessionTemplateBeanDefinition(AnnotationAttributes attributes) {
+        BeanDefinitionBuilder builder = genericBeanDefinition(SqlSessionTemplate.class);
+        ExecutorType executorType = attributes.getEnum("executorType");
+        builder.addConstructorArgReference(SQL_SESSION_FACTORY_BEAN_NAME);
+        builder.addConstructorArgValue(executorType);
         return builder.getBeanDefinition();
     }
 
@@ -350,214 +251,5 @@ public class MyBatisBeanDefinitionRegistrar extends BeanCapableImportCandidate i
         }
         properties.putAll(stringArrayToProperties(configurationProperties));
         return properties;
-    }
-
-    /**
-     * Convert an array of {@code "key = value"} strings into a {@link Properties} object.
-     *
-     * <h3>Example Usage</h3>
-     * <pre>{@code
-     *   Properties props = MyBatisBeanDefinitionRegistrar.stringArrayToProperties(new String[]{
-     *       "jdbc.driver = org.h2.Driver",
-     *       "jdbc.url    = jdbc:h2:mem:test"
-     *   });
-     * }</pre>
-     *
-     * @param lines an array of {@code "key=value"} strings
-     * @return a {@link Properties} populated from the given lines; never {@code null}
-     * @throws IllegalArgumentException if any line does not contain exactly one {@code =} separator
-     */
-    static Properties stringArrayToProperties(String[] lines) {
-        Properties properties = new Properties();
-        for (String line : lines) {
-            String[] keyAndValue = split(line, EQUAL);
-            assertTrue(length(keyAndValue) == 2, () -> format("The configuration property is invalid, the content must contain key and value : '{}'", line));
-            String key = trimAllWhitespace(keyAndValue[0]);
-            String value = trimAllWhitespace(keyAndValue[1]);
-            properties.setProperty(key, value);
-        }
-        return properties;
-    }
-
-    /**
-     * Set a package-based property value on the builder from the annotation attributes, joining
-     * multiple packages with a line separator when more than one is provided.
-     *
-     * @param builder       the {@link BeanDefinitionBuilder}
-     * @param attributes    the resolved annotation attributes
-     * @param attributeName the name of the attribute holding the package(s)
-     */
-    void setPackagePropertyValue(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName) {
-        String[] packages = attributes.getStringArray(attributeName);
-        logger.trace("Try to set the package({}) property value by the attribute[name : '{}']", arrayToString(packages), attributeName);
-        int length = length(packages);
-        final String packageName;
-        if (length == 0) {
-            packageName = null;
-        } else if (length == 1) {
-            packageName = packages[0];
-        } else {
-            StringJoiner packageJoiner = new StringJoiner(LINE_SEPARATOR);
-            for (String pkg : packages) {
-                packageJoiner.add(pkg);
-            }
-            packageName = packageJoiner.toString();
-        }
-        if (isBlank(packageName)) {
-            logger.trace("No package property value specified by the attribute[name : '{}']", attributeName);
-        } else {
-            setPropertyValue(builder, attributeName, packageName);
-        }
-    }
-
-    /**
-     * Resolve the Spring bean name from the annotation attribute and set it as a
-     * {@link RuntimeBeanReference} property value on the builder.
-     *
-     * @param builder       the {@link BeanDefinitionBuilder}
-     * @param attributes    the resolved annotation attributes
-     * @param attributeName the name of the attribute holding the bean name (or {@code *} for primary)
-     * @param beanType      the expected type of the referenced bean, used for primary-bean lookup
-     */
-    void setBeanReferencePropertyValue(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName, Class<?> beanType) {
-        String beanName = attributes.getString(attributeName);
-        logger.trace("Try to set the Spring Bean[{} , name : '{}'] Reference property value by the attribute[name : '{}']", beanType, beanName, attributeName);
-        setBeanReferencePropertyValue(builder, attributeName, beanName, beanType);
-    }
-
-    /**
-     * Resolve multiple Spring bean names from the annotation attribute and add each as a
-     * {@link RuntimeBeanReference} property value on the builder.
-     *
-     * @param builder       the {@link BeanDefinitionBuilder}
-     * @param attributes    the resolved annotation attributes
-     * @param attributeName the name of the attribute holding the bean name(s)
-     * @param beanType      the expected type of each referenced bean
-     */
-    void setBeanReferencePropertyValues(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName, Class<?> beanType) {
-        String[] beanNames = attributes.getStringArray(attributeName);
-        logger.trace("Try to set the Spring Bean[{} , names : '{}'] Reference property values by the attribute[name : '{}']", beanType, arrayToString(beanNames), attributeName);
-
-        int length = length(beanNames);
-        if (length == 0) {
-            logger.debug("No Spring Bean was speicified by the attribute[name : '{}']", attributeName);
-        } else {
-            for (int i = 0; i < length; i++) {
-                String beanName = beanNames[i];
-                setBeanReferencePropertyValue(builder, attributeName, beanName, beanType);
-            }
-        }
-    }
-
-    /**
-     * Set a {@link RuntimeBeanReference} property on the builder, resolving the primary bean when
-     * the name is the wildcard {@code *}.
-     *
-     * @param builder       the {@link BeanDefinitionBuilder}
-     * @param attributeName the property name to set
-     * @param beanName      the explicit bean name, {@code *} for primary, or blank to skip
-     * @param beanType      the type used for primary-bean lookup when the name is {@code *}
-     */
-    void setBeanReferencePropertyValue(BeanDefinitionBuilder builder, String attributeName, String beanName, Class<?> beanType) {
-        if (isBlank(beanName)) {
-            logger.trace("No Spring Bean[{}] was speicified by the attribute[name : '{}']", beanType, attributeName);
-        } else if (WILDCARD.equals(beanName)) {
-            String targetBeanName = findTargetBeanName(beanType);
-            setBeanReferencePropertyValue(builder, attributeName, targetBeanName, beanType);
-        } else {
-            setBeanReferencePropertyValue(builder, attributeName, beanName);
-        }
-    }
-
-    /**
-     * Set a {@link RuntimeBeanReference} for the named bean as a property on the builder.
-     *
-     * @param builder       the {@link BeanDefinitionBuilder}
-     * @param attributeName the property name to set
-     * @param beanName      the name of the bean to reference; must not be blank
-     */
-    void setBeanReferencePropertyValue(BeanDefinitionBuilder builder, String attributeName, String beanName) {
-        setPropertyValue(builder, attributeName, new RuntimeBeanReference(beanName));
-    }
-
-    /**
-     * Find the single bean name for the given type: returns the sole name, the primary-bean name
-     * (when multiple beans are registered), or {@code null} when none is found.
-     *
-     * @param beanType the bean type to look up
-     * @return the resolved bean name or {@code null}
-     */
-    String findTargetBeanName(Class<?> beanType) {
-        String[] beanNames = getBeanNamesByType(beanType);
-        int length = length(beanNames);
-        final String targetBeanName;
-        if (length == 0) {
-            targetBeanName = null;
-        } else if (length == 1) {
-            targetBeanName = beanNames[0];
-        } else {
-            ConfigurableListableBeanFactory beanFactory = super.getBeanFactory();
-            // Find the name of primary bean
-            targetBeanName = Stream.of(beanNames).filter(beanName -> {
-                        BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-                        return beanDefinition.isPrimary();
-                    })
-                    .findFirst()
-                    .orElse(null);
-        }
-        return targetBeanName;
-    }
-
-    /**
-     * Retrieve all Spring bean names (including non-singleton and factory beans) of the given type.
-     *
-     * @param beanType the type to look up
-     * @return the array of bean names; never {@code null}, may be empty
-     */
-    String[] getBeanNamesByType(Class<?> beanType) {
-        ConfigurableListableBeanFactory beanFactory = super.getBeanFactory();
-        return getBeanNames(beanFactory, beanType, true);
-    }
-
-    /**
-     * Set a property value on the builder, skipping the attribute when its value equals the
-     * supplied {@code defaultValue}.
-     *
-     * @param builder       the {@link BeanDefinitionBuilder}
-     * @param attributes    the resolved annotation attributes
-     * @param attributeName the attribute (and property) name
-     * @param defaultValue  the value to compare against; when equal the property is not set
-     */
-    void setPropertyValue(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName, Object defaultValue) {
-        Object value = attributes.get(attributeName);
-        if (Objects.equals(defaultValue, value)) {
-            logger.trace("Default property value[{}] will ignored the attribute[name : '{}']", defaultValue, attributeName);
-            return;
-        }
-        setPropertyValue(builder, attributeName, value);
-    }
-
-    /**
-     * Set a property value on the builder directly from the annotation attribute value.
-     *
-     * @param builder       the {@link BeanDefinitionBuilder}
-     * @param attributes    the resolved annotation attributes
-     * @param attributeName the attribute (and property) name
-     */
-    void setPropertyValue(BeanDefinitionBuilder builder, AnnotationAttributes attributes, String attributeName) {
-        Object attributeValue = attributes.get(attributeName);
-        setPropertyValue(builder, attributeName, attributeValue);
-    }
-
-    /**
-     * Add a property value directly to the builder.
-     *
-     * @param builder        the {@link BeanDefinitionBuilder}
-     * @param attributeName  the property name
-     * @param attributeValue the property value
-     */
-    void setPropertyValue(BeanDefinitionBuilder builder, String attributeName, Object attributeValue) {
-        logger.trace("Set the BeanDefinition[{}] property[name : '{}'  , value : '{}']", builder.getRawBeanDefinition(), attributeName, attributeValue);
-        builder.addPropertyValue(attributeName, attributeValue);
     }
 }

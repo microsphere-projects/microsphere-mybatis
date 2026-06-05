@@ -124,4 +124,23 @@ Note: This release includes no functional code changes outside documentation and
 ### Other Changes
 - Internal version bumps and merges to maintain release alignment. ([#c0b248f](https://example.com), [#1cb846f](https://example.com), [#2cb4549](https://example.com), [#07c6b45](https://example.com))
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.7...0.2.8
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.7...0.2.8## v0.2.9
+
+# Release Notes for Version 0.2.9
+
+## New Features
+- Simplified bean registration helpers for easier integration. (#20476f0)
+- Removed the SPI bean registration method to streamline functionality. (#d55becf)
+
+## Documentation
+- Updated README with the latest versions for better clarity. (#a8d541b)
+
+## Dependency Updates
+- Bumped parent dependency to version `0.2.16`. (#a8d541b)
+
+## Build and Workflow Enhancements
+- Regular merges between `main` and `release` branches to ensure synchronization. (e.g., #2b2a248, #b3b3234, #546138c, #f7e90b3)
+
+---
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.8...0.2.9
