@@ -18,7 +18,6 @@
 package io.microsphere.mybatis.spring.annotation;
 
 import io.microsphere.spring.core.annotation.AnnotationUtils;
-import io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -27,7 +26,6 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 
-import java.lang.annotation.Annotation;
 import java.util.Map.Entry;
 
 import static io.microsphere.collection.Sets.ofSet;

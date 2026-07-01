@@ -31,8 +31,6 @@ import org.apache.ibatis.type.TypeHandler;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
@@ -45,24 +43,13 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 
 import javax.sql.DataSource;
-import java.util.Objects;
 import java.util.Properties;
-import java.util.StringJoiner;
-import java.util.stream.Stream;
 
-import static io.microsphere.constants.SeparatorConstants.LINE_SEPARATOR;
-import static io.microsphere.constants.SymbolConstants.EQUAL;
-import static io.microsphere.constants.SymbolConstants.WILDCARD;
 import static io.microsphere.mybatis.spring.annotation.MyBatisConfigurationBeanDefintionRegistrar.CONFIGURATION_BEAN_NAME;
-import static io.microsphere.spring.beans.BeanUtils.getBeanNames;
 import static io.microsphere.spring.core.env.PropertySourcesUtils.getPropertyNames;
 import static io.microsphere.text.FormatUtils.format;
-import static io.microsphere.util.ArrayUtils.arrayToString;
-import static io.microsphere.util.ArrayUtils.length;
 import static io.microsphere.util.Assert.assertTrue;
 import static io.microsphere.util.StringUtils.isBlank;
-import static io.microsphere.util.StringUtils.split;
-import static io.microsphere.util.StringUtils.trimAllWhitespace;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 /**
