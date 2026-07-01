@@ -17,7 +17,7 @@
 
 package io.microsphere.mybatis.spring.annotation;
 
-import io.microsphere.spring.context.annotation.BeanCapableImportCandidate;
+import io.microsphere.spring.context.annotation.AnnotatedBeanCapableImportBeanDefinitionRegistrar;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -25,7 +25,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.core.type.AnnotationMetadata;
 
 import java.lang.annotation.Annotation;
 import java.util.Objects;
@@ -55,27 +54,8 @@ import static org.springframework.core.ResolvableType.forType;
  * @see ImportBeanDefinitionRegistrar
  * @since 1.0.0
  */
-abstract class MyBatisImportBeanDefinitionRegistrar<A extends Annotation> extends BeanCapableImportCandidate
+abstract class MyBatisImportBeanDefinitionRegistrar<A extends Annotation> extends AnnotatedBeanCapableImportBeanDefinitionRegistrar<A>
         implements ImportBeanDefinitionRegistrar {
-
-    protected final Class<A> annotationType;
-
-    MyBatisImportBeanDefinitionRegistrar() {
-        this.annotationType = (Class<A>) forType(this.getClass())
-                .as(MyBatisImportBeanDefinitionRegistrar.class)
-                .getGeneric(0)
-                .resolve();
-    }
-
-    @Override
-    public final void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-        AnnotationAttributes attributes = getAnnotationAttributes(metadata, this.annotationType);
-        registerBeanDefinitions(attributes, metadata, registry);
-    }
-
-    protected abstract void registerBeanDefinitions(AnnotationAttributes attributes, AnnotationMetadata metadata,
-                                                    BeanDefinitionRegistry registry);
-
 
     protected void registerBeanDefinitionIfAbsent(AnnotationAttributes attributes, BeanDefinitionRegistry registry,
                                                   String beanName,

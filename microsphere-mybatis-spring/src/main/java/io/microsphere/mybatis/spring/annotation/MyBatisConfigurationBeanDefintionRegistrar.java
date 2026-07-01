@@ -18,17 +18,21 @@
 package io.microsphere.mybatis.spring.annotation;
 
 import io.microsphere.spring.core.annotation.AnnotationUtils;
+import io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.type.AnnotationMetadata;
 
 import java.util.Map.Entry;
 
 import static io.microsphere.collection.Sets.ofSet;
+import static io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes.of;
 import static io.microsphere.util.ClassLoaderUtils.resolveClass;
 import static io.microsphere.util.ClassUtils.newInstance;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
@@ -67,12 +71,21 @@ class MyBatisConfigurationBeanDefintionRegistrar extends MyBatisImportBeanDefini
     public static final String CONFIGURATION_BEAN_NAME = "configuration";
 
     @Override
-    protected void registerBeanDefinitions(AnnotationAttributes attributes, AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-        String configClassName = metadata.getClassName();
-        Class<?> configClass = resolveClass(configClassName, super.classLoader);
-        MyBatisConfiguration myBatisConfiguration = configClass.getAnnotation(super.annotationType);
-        AnnotationAttributes annotationAttributes = AnnotationUtils.getAnnotationAttributes(myBatisConfiguration, super.environment, true);
+    protected void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry,
+                                           BeanNameGenerator importBeanNameGenerator,
+                                           ResolvablePlaceholderAnnotationAttributes<MyBatisConfiguration> annotationAttributes) {
         registerConfigurationIfAbsent(annotationAttributes, registry);
+    }
+
+    @Override
+    protected ResolvablePlaceholderAnnotationAttributes<MyBatisConfiguration> getAnnotationAttributes(AnnotationMetadata metadata) {
+        String configClassName = metadata.getClassName();
+        Class<?> configClass = resolveClass(configClassName, getClassLoader());
+        Class<MyBatisConfiguration> annotationType = getAnnotationType();
+        ConfigurableEnvironment environment = getEnvironment();
+        MyBatisConfiguration myBatisConfiguration = configClass.getAnnotation(annotationType);
+        AnnotationAttributes annotationAttributes = AnnotationUtils.getAnnotationAttributes(myBatisConfiguration, environment, true);
+        return of(annotationAttributes, annotationType, environment);
     }
 
     private void registerConfigurationIfAbsent(AnnotationAttributes attributes, BeanDefinitionRegistry registry) {
@@ -102,4 +115,5 @@ class MyBatisConfigurationBeanDefintionRegistrar extends MyBatisImportBeanDefini
         }
         return builder.getBeanDefinition();
     }
+
 }

@@ -23,9 +23,11 @@ import io.microsphere.mybatis.executor.ExecutorInterceptor;
 import io.microsphere.mybatis.executor.InterceptingExecutor;
 import io.microsphere.mybatis.plugin.InterceptingExecutorInterceptor;
 import io.microsphere.spring.beans.BeanSource;
+import io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
@@ -67,12 +69,15 @@ public class MyBatisExtensionBeanDefinitionRegistrar extends MyBatisImportBeanDe
      * from the specified sources, and conditionally registering the
      * {@link InterceptingExecutorInterceptor} if any filters or interceptors are present.
      *
-     * @param attributes the resolved {@link AnnotationAttributes} from {@link EnableMyBatisExtension}
-     * @param metadata   the {@link AnnotationMetadata} of the importing class
-     * @param registry   the {@link BeanDefinitionRegistry} to register bean definitions with
+     * @param metadata                the {@link AnnotationMetadata} of the importing class
+     * @param registry                the {@link BeanDefinitionRegistry} to register bean definitions into
+     * @param importBeanNameGenerator the {@link BeanNameGenerator} to use for generating bean names
+     * @param attributes              the resolved {@link AnnotationAttributes} from {@link EnableMyBatisExtension}
      */
     @Override
-    protected void registerBeanDefinitions(AnnotationAttributes attributes, AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+    protected void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry,
+                                           BeanNameGenerator importBeanNameGenerator,
+                                           ResolvablePlaceholderAnnotationAttributes<EnableMyBatisExtension> attributes) {
         if (attributes.getBoolean("interceptExecutor")) {
             BeanSource[] sources = (BeanSource[]) attributes.get("sources");
             registerExecutorFilters(sources);

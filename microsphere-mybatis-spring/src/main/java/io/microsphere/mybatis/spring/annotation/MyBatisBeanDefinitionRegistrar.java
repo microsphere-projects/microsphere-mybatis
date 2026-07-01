@@ -18,6 +18,7 @@
 package io.microsphere.mybatis.spring.annotation;
 
 import io.microsphere.spring.context.annotation.BeanCapableImportCandidate;
+import io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -33,6 +34,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -89,13 +91,15 @@ public class MyBatisBeanDefinitionRegistrar extends MyBatisImportBeanDefinitionR
     public static final String SQL_SESSION_TEMPLATE_BEAN_NAME = "sqlSessionTemplate";
 
     @Override
-    protected void registerBeanDefinitions(AnnotationAttributes attributes, AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+    protected void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry,
+                                           BeanNameGenerator importBeanNameGenerator,
+                                           ResolvablePlaceholderAnnotationAttributes<EnableMyBatis> annotationAttributes) {
 
         // Register the BeanDefinition of SqlSessionFactoryBean if absent
-        registerSqlSessionFactoryBeanIfAbsent(attributes, registry);
+        registerSqlSessionFactoryBeanIfAbsent(annotationAttributes, registry);
 
         // Register the BeanDefinition of SqlSessionTemplate if absent
-        registerSqlSessionTemplateIfAbsent(attributes, registry);
+        registerSqlSessionTemplateIfAbsent(annotationAttributes, registry);
     }
 
     /**
@@ -239,4 +243,5 @@ public class MyBatisBeanDefinitionRegistrar extends MyBatisImportBeanDefinitionR
         properties.putAll(stringArrayToProperties(configurationProperties));
         return properties;
     }
+
 }
