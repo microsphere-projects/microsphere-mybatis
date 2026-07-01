@@ -1,0 +1,42 @@
+microsphere:
+  spring:
+    cloud:
+      features:
+        abstract:
+          mybatis:
+            - org.apache.ibatis.executor.Executor
+            - org.apache.ibatis.plugin.Interceptor
+            - org.apache.ibatis.type.TypeHandler
+            - org.apache.ibatis.scripting.LanguageDriver
+            - org.apache.ibatis.mapping.DatabaseIdProvider
+            - org.apache.ibatis.datasource.DataSourceFactory
+            - org.apache.ibatis.session.SqlSessionFactory
+            - org.apache.ibatis.transaction.TransactionFactory
+            - org.apache.ibatis.session.Configuration
+            - org.apache.ibatis.cache.Cache
+            - org.apache.ibatis.executor.keygen.KeyGenerator
+            - org.apache.ibatis.executor.loader.ProxyFactory
+            - org.apache.ibatis.executor.parameter.ParameterHandler
+            - org.apache.ibatis.session.ResultContext
+            - org.apache.ibatis.executor.resultset.ResultSetHandler
+            - org.apache.ibatis.executor.statement.StatementHandler
+            - org.apache.ibatis.session.ResultHandler
+            - org.apache.ibatis.mapping.SqlSource
+            - org.apache.ibatis.reflection.ReflectorFactory
+          mybatis-spring:
+            - org.mybatis.spring.SqlSessionTemplate
+            - org.mybatis.spring.mapper.MapperFactoryBean
+            - org.mybatis.spring.mapper.MapperScannerConfigurer
+            - org.mybatis.spring.config.MapperScannerBeanDefinitionParser
+            - org.mybatis.spring.SqlSessionFactoryBean
+            - org.mybatis.spring.transaction.SpringManagedTransactionFactory
+          mybatis-spring-boot-autoconfigure:
+            - org.mybatis.spring.boot.autoconfigure.MybatisProperties
+            - org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer
+            - org.mybatis.spring.boot.autoconfigure.SqlSessionFactoryBeanCustomizer
+          microsphere-mybatis-core:
+            - io.microsphere.mybatis.executor.ExecutorFilter
+            - io.microsphere.mybatis.executor.ExecutorInterceptor
+        named:
+          microsphere-mybatis-spring-boot:
+            - ConditionalOnMyBatisAvailable: io.microsphere.mybatis.spring.boot.autoconfigure.condition.ConditionalOnMyBatisAvailable

@@ -17,18 +17,23 @@
 
 package io.microsphere.mybatis.spring.cloud.autoconfigure;
 
+import io.microsphere.mybatis.executor.LoggingExecutorFilter;
+import io.microsphere.mybatis.executor.LoggingExecutorInterceptor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.client.actuator.FeaturesEndpoint;
 import org.springframework.cloud.client.actuator.HasFeatures;
 import org.springframework.cloud.client.actuator.NamedFeature;
 
 import java.util.List;
+import java.util.Map;
 
-import static io.microsphere.mybatis.spring.cloud.autoconfigure.MyBatisCloudAutoConfiguration.FeaturesConfiguration.MYBATIS_FEATURES_BEAN_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
  * {@link MyBatisCloudAutoConfiguration} Test
@@ -38,18 +43,45 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 1.0.0
  */
 @SpringBootTest(classes = {
+        LoggingExecutorFilter.class,
+        LoggingExecutorInterceptor.class,
         MyBatisCloudAutoConfigurationTest.class
-})
+}, webEnvironment = NONE,
+        properties = {
+                "spring.cloud.features.enabled=true",
+                "management.endpoints.web.exposure.include=*",
+        }
+)
 @EnableAutoConfiguration
 class MyBatisCloudAutoConfigurationTest {
 
     @Autowired
-    @Qualifier(MYBATIS_FEATURES_BEAN_NAME)
-    private HasFeatures hasFeatures;
+    private Map<String, HasFeatures> hasFeaturesMap;
+
+    @Autowired
+    private FeaturesEndpoint featuresEndpoint;
 
     @Test
-    void test() {
-        List<NamedFeature> namedFeatures = hasFeatures.getNamedFeatures();
-        assertEquals(2, namedFeatures.size());
+    public void test() {
+        assertTrue(this.hasFeaturesMap.size() > 0);
+        HasFeatures hadFeatures = this.hasFeaturesMap.get("mybatis.features");
+        assertNotNull(hadFeatures);
+
+        hadFeatures = this.hasFeaturesMap.get("mybatis-spring.features");
+        assertNotNull(hadFeatures);
+
+        hadFeatures = this.hasFeaturesMap.get("mybatis-spring-boot-autoconfigure.features");
+        assertNotNull(hadFeatures);
+
+        hadFeatures = this.hasFeaturesMap.get("microsphere-mybatis-core.features");
+        assertNotNull(hadFeatures);
+
+        assertNotNull(featuresEndpoint.features());
+    }
+
+    private void assertNamedFeature(List<NamedFeature> namedFeatures, int index, String name, Class<?> type) {
+        NamedFeature namedFeature = namedFeatures.get(index);
+        assertEquals(name, namedFeature.getName());
+        assertEquals(type, namedFeature.getType());
     }
 }

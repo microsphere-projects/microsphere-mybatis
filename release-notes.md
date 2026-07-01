@@ -143,4 +143,23 @@ Note: This release includes no functional code changes outside documentation and
 
 ---
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.8...0.2.9
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.8...0.2.9## v0.2.10
+
+# Release Notes - Version 0.2.10
+
+## ✨ New Features
+- **MyBatis Support**: 
+  - Added `EnableMyBatisExtension` and implemented a test interceptor. [#2fe8eef](https://github.com/commit/2fe8eef)  
+  - Introduced `ConditionalOnMyBatisAvailable` for enhanced conditional configuration. [#455ec73](https://github.com/commit/455ec73)  
+  - Refactored registrars to support MyBatis extensions. [#f1284c3](https://github.com/commit/f1284c3)
+
+## 📄 Documentation
+- Updated branch version numbers in the `README`. [#9110a26](https://github.com/commit/9110a26)
+
+## 🔧 Build and Workflow Enhancements
+- Performed merges between main and release branches. [#5975fb5](https://github.com/commit/5975fb5), [#1f9fb3c](https://github.com/commit/1f9fb3c), [#7e0594b](https://github.com/commit/7e0594b), [#b32b47e](https://github.com/commit/b32b47e)
+- Bumped version to prepare for development after `0.2.9`. [#049b808](https://github.com/commit/049b808)
+
+---
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.9...0.2.10
