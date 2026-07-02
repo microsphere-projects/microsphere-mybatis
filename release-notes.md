@@ -162,4 +162,21 @@ Note: This release includes no functional code changes outside documentation and
 
 ---
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.9...0.2.10
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.9...0.2.10## v0.2.11
+
+# Release Notes for Version 0.2.11
+
+## Dependency Updates
+- Upgraded `microsphere-spring-cloud` to version **0.2.21**. (#271fe2b)
+
+## Code Improvements
+- Refactored MyBatis registrar annotation handling to enhance maintainability. (#b358f93)
+- Removed unused imports in MyBatis configuration. (#c0d1cf4)
+
+## Documentation
+- Updated `README` to reflect branch version number changes. (#699d2e5)
+
+## Other Changes
+- Miscellaneous version bumps and branch merges. [skip ci]
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.10...0.2.11

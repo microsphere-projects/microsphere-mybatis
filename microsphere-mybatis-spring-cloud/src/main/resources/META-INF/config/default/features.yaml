@@ -39,4 +39,4 @@ microsphere:
             - io.microsphere.mybatis.executor.ExecutorInterceptor
         named:
           microsphere-mybatis-spring-boot:
-            - ConditionalOnMyBatisAvailable: io.microsphere.mybatis.spring.boot.autoconfigure.condition.ConditionalOnMyBatisAvailable
+            ConditionalOnMyBatisAvailable: io.microsphere.mybatis.spring.boot.autoconfigure.condition.ConditionalOnMyBatisAvailable
