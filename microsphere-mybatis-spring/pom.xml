@@ -22,20 +22,28 @@
 
     <dependencies>
 
-        <!-- Microsphere Mybatis -->
+        <!-- Microsphere Annotation Processor -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-annotation-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Microsphere Mybatis Core -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-mybatis-core</artifactId>
             <version>${revision}</version>
         </dependency>
 
-        <!-- Microsphere Spring -->
+        <!-- Microsphere Spring Context -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-context</artifactId>
+            <optional>true</optional>
         </dependency>
 
-        <!-- Mybatis -->
+        <!-- Mybatis Dependencies -->
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
@@ -48,7 +56,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring Framework -->
+        <!-- Spring Dependencies -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
@@ -67,6 +75,7 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Java Common Annotations -->
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
@@ -87,20 +96,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- H2 -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Logback -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Microsphere Mybatis Spring Test -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
@@ -116,10 +111,25 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- H2 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Logback -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- CGLIB -->
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
-            <version>3.3.0</version>
+            <version>${cglib.version}</version>
             <scope>test</scope>
         </dependency>
 

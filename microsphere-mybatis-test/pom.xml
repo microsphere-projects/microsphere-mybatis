@@ -22,6 +22,13 @@
 
     <dependencies>
 
+        <!-- Microsphere Annotation Processor -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-annotation-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Microsphere Mybatis Utils -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
@@ -33,6 +40,7 @@
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-java-test</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Mybatis -->

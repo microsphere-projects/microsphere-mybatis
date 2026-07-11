@@ -22,15 +22,17 @@
 
     <dependencies>
 
-        <!-- Microsphere -->
-        <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-java-core</artifactId>
-        </dependency>
-
+        <!-- Microsphere Annotation Processor -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-annotation-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Microsphere Java Core -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-java-core</artifactId>
             <optional>true</optional>
         </dependency>
 
