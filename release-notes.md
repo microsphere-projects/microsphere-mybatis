@@ -195,4 +195,37 @@ Note: This release includes no functional code changes outside documentation and
 
 ---
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.11...0.2.12
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.11...0.2.12## v0.2.13
+
+# Release Notes for Version 0.2.13
+
+## New Features
+- **Optional Dependency Enhancements**:  
+  - Added optional annotation processor dependency.  
+  - Introduced optional dependencies for `spring-test` module.  
+
+## Bug Fixes
+- **MyBatis Improvements**:  
+  - Refined MyBatis cloud auto-configuration tests.  
+  - Hardened availability condition checks for MyBatis.  
+  - Improved condition annotations for MyBatis.  
+
+## Test Improvements
+- Renamed "auto-config test" to "integration test" for better clarity.  
+- Enhanced alignment and structure in MyBatis-related test cases.  
+
+## Dependency Updates
+- Updated Microsphere Spring Cloud version to `0.2.23`.  
+- Added `cglib` version property to parent POM for consistency.  
+- Refined and reordered module dependencies across core, Spring Boot, Spring Cloud, and Microsphere utilities.
+
+## Build and Workflow Enhancements
+- Reordered and refined spring module dependency declarations to improve maintainability.  
+- Minor adjustments in build configuration and dependencies for better project structure.  
+
+## Documentation
+- Updated `README` to reflect branch version matrix accurately.  
+
+---  
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.12...0.2.13
