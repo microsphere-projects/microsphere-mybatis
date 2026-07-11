@@ -179,4 +179,20 @@ Note: This release includes no functional code changes outside documentation and
 ## Other Changes
 - Miscellaneous version bumps and branch merges. [skip ci]
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.10...0.2.11
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.10...0.2.11## v0.2.12
+
+# Release Notes: v0.2.12
+
+## Bug Fixes
+- Fixed feature condition mapping to ensure accurate behavior. ([6f786e0](#))
+
+## Documentation
+- Updated README for clarity and accuracy. ([b2dfc23](#))
+
+## Other Changes
+- Version bumped post v0.2.11 release. ([74935c4](#))
+- Merged main and release branches for synchronization. ([236d822](#), [0d4da4d](#), [17bc8b7](#)) 
+
+---
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.11...0.2.12
