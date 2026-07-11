@@ -17,55 +17,48 @@
 
 package io.microsphere.mybatis.spring.boot.autoconfigure;
 
+
 import io.microsphere.mybatis.executor.LoggingExecutorFilter;
-import io.microsphere.mybatis.executor.LoggingExecutorInterceptor;
 import io.microsphere.mybatis.plugin.InterceptingExecutorInterceptor;
-import io.microsphere.mybatis.spring.annotation.EnableMyBatis;
+import io.microsphere.spring.boot.test.AutoConfigurationTest;
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.junit.jupiter.api.Test;
-import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static io.microsphere.mybatis.spring.annotation.MyBatisBeanDefinitionRegistrar.SQL_SESSION_FACTORY_BEAN_NAME;
-import static io.microsphere.mybatis.spring.annotation.MyBatisBeanDefinitionRegistrar.SQL_SESSION_TEMPLATE_BEAN_NAME;
-import static io.microsphere.mybatis.spring.annotation.MyBatisExtensionBeanDefinitionRegistrar.INTERCEPTING_EXECUTOR_INTERCEPTOR_BEAN_NAME;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Set;
+
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
  * {@link MyBatisAutoConfiguration} Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see MyBatisAutoConfiguration
- * @see EnableMyBatis
  * @since 1.0.0
  */
-@SpringBootTest(classes = {
-        LoggingExecutorFilter.class,
-        LoggingExecutorInterceptor.class,
-        MyBatisAutoConfigurationTest.class
-})
-@EnableAutoConfiguration
-class MyBatisAutoConfigurationTest {
+@SpringBootTest(
+        classes = {
+                LoggingExecutorFilter.class,
+                MyBatisAutoConfigurationTest.class
+        },
+        webEnvironment = NONE
+)
+class MyBatisAutoConfigurationTest extends AutoConfigurationTest<MyBatisAutoConfiguration> {
 
-    @Autowired
-    @Qualifier(SQL_SESSION_FACTORY_BEAN_NAME)
-    private SqlSessionFactory sqlSessionFactory;
+    @Override
+    protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
+        // InterceptingExecutorInterceptor sources from MyBatisExtensionBeanDefinitionRegistrar
+        autoConfiguredClasses.add(InterceptingExecutorInterceptor.class);
+    }
 
-    @Autowired
-    @Qualifier(SQL_SESSION_TEMPLATE_BEAN_NAME)
-    private SqlSessionTemplate sqlSessionTemplate;
+    @Override
+    protected void configureGlobalDisabledPropertyValues(Set<String> globalDisabledPropertyValues) {
+        globalDisabledPropertyValues.add("microsphere.mybatis.enabled=false");
+    }
 
-    @Autowired
-    @Qualifier(INTERCEPTING_EXECUTOR_INTERCEPTOR_BEAN_NAME)
-    private InterceptingExecutorInterceptor interceptingExecutorInterceptor;
-
-    @Test
-    void test() {
-        assertNotNull(sqlSessionFactory);
-        assertNotNull(sqlSessionTemplate);
-        assertNotNull(interceptingExecutorInterceptor);
+    @Override
+    protected void configureGlobalMissingClasses(Set<Class<?>> globalMissingClasses) {
+        globalMissingClasses.add(SqlSession.class);
+        globalMissingClasses.add(SqlSessionFactory.class);
     }
 }

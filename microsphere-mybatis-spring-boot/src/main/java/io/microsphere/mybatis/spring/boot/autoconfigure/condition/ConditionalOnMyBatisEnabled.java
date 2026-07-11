@@ -19,7 +19,6 @@ package io.microsphere.mybatis.spring.boot.autoconfigure.condition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -50,7 +49,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(TYPE)
 @Retention(RUNTIME)
 @Documented
-@Inherited
 @ConditionalOnProperty(name = MICROSPHERE_MYBATIS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 public @interface ConditionalOnMyBatisEnabled {
 }

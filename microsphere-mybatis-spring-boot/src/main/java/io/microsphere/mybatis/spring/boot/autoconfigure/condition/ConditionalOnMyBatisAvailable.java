@@ -19,7 +19,6 @@ package io.microsphere.mybatis.spring.boot.autoconfigure.condition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -54,8 +53,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(TYPE)
 @Retention(RUNTIME)
 @Documented
-@Inherited
 @ConditionalOnMyBatisEnabled
-@ConditionalOnClass(name = "org.apache.ibatis.session.SqlSessionFactory")
+@ConditionalOnClass(name = {
+        "org.apache.ibatis.session.SqlSession",                     // MyBatis Core API
+        "org.apache.ibatis.session.SqlSessionFactory"               // MyBatis Spring API
+})
 public @interface ConditionalOnMyBatisAvailable {
 }
