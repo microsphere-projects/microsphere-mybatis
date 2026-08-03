@@ -47,7 +47,7 @@ class SqlSessionFactoryBeanPostProcessor extends GenericBeanPostProcessorAdapter
 
     @Override
     protected void processBeforeInitialization(SqlSessionFactoryBean bean, String beanName) throws BeansException {
-        Interceptor[] plugins = getFieldValue(bean, "plugins");
+        Interceptor[] plugins = getFieldValue(true, bean, "plugins");
         if (contains(plugins, this.interceptingExecutorInterceptor)) {
             return;
         }

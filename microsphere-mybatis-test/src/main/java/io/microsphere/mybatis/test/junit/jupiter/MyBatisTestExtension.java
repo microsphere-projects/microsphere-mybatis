@@ -100,7 +100,7 @@ public class MyBatisTestExtension implements BeforeAllCallback, AfterAllCallback
             ComponentResolver resolver = getComponentResolver(extensionContext, field);
             Object component = resolveComponent(resolver, extensionContext, field.getType());
             if (component != null) {
-                setFieldValue(testInstance, field, component);
+                setFieldValue(true, testInstance, field, component);
             }
         }
     }

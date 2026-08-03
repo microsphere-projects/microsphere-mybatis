@@ -61,7 +61,7 @@ public abstract class Executors {
      * @return the underlying delegate {@link Executor}
      */
     public static Executor getDelegate(CachingExecutor cachingExecutor) {
-        Executor delegate = getFieldValue(cachingExecutor, "delegate");
+        Executor delegate = getFieldValue(true, cachingExecutor, "delegate");
         logger.trace("The delegate of {} is : {}", cachingExecutor, delegate);
         return delegate;
     }
