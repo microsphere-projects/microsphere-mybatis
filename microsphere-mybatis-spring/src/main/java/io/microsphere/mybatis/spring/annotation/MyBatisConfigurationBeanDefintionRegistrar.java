@@ -32,9 +32,9 @@ import org.springframework.core.type.AnnotationMetadata;
 import java.util.Map.Entry;
 
 import static io.microsphere.collection.Sets.ofSet;
+import static io.microsphere.reflect.ConstructorUtils.newInstance;
 import static io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes.of;
 import static io.microsphere.util.ClassLoaderUtils.resolveClass;
-import static io.microsphere.util.ClassUtils.newInstance;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 /**
@@ -106,7 +106,7 @@ class MyBatisConfigurationBeanDefintionRegistrar extends MyBatisImportBeanDefini
                 attributeValue = ofSet(methods);
             } else if ("proxyFactory".equals(attributeName)) {
                 Class<?> proxyFactoryClass = (Class<?>) attributeValue;
-                attributeValue = newInstance(proxyFactoryClass);
+                attributeValue = newInstance(true, proxyFactoryClass);
             } else if ("variables".equals(attributeName)) {
                 String[] variables = (String[]) attributeValue;
                 attributeValue = stringArrayToProperties(variables);
