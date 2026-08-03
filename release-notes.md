@@ -228,4 +228,21 @@ Note: This release includes no functional code changes outside documentation and
 
 ---  
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.12...0.2.13
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.12...0.2.13## v0.2.14
+
+```markdown
+# Release Notes - Version 0.2.14
+
+## Dependency Updates
+- Updated parent version and optional core dependency. (#2f9e5c4)
+
+## Documentation
+- Updated README to reference the correct branch version. (#d2ddc29)
+
+## Other Changes
+- Version bumped to initiate next patch cycle after publishing 0.2.13. (#6466792)
+
+---
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.13...0.2.14
