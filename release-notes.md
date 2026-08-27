@@ -245,4 +245,20 @@ Note: This release includes no functional code changes outside documentation and
 ---
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.13...0.2.14
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.13...0.2.14## v0.2.15
+
+_Release notes generation failed. Raw commits since 0.2.14:_
+
+```
+404a3a8 Update README.md
+28f662f chore: merge main into release [skip ci]
+aa0e789 Fix proxy factory instantiation
+a667ddf chore: merge main into release [skip ci]
+4fbaccd Fix reflective access to private MyBatis fields
+d4d7aea chore: merge main into release [skip ci]
+c669ba2 Bump microsphere-spring-cloud to 0.2.25
+8dd8f05 chore: merge release into main [skip ci]
+34ba825 chore: bump version to next patch after publishing 0.2.14
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.14...0.2.15
