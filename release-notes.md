@@ -261,4 +261,22 @@ c669ba2 Bump microsphere-spring-cloud to 0.2.25
 34ba825 chore: bump version to next patch after publishing 0.2.14
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.14...0.2.15
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.14...0.2.15## v0.2.16
+
+_Release notes generation failed. Raw commits since 0.2.15:_
+
+```
+c183692 chore: merge main into release [skip ci]
+1520202 Merge pull request #67 from microsphere-projects/dependabot/maven/org.mybatis-mybatis-spring-4.1.0
+0471449 Update version numbers in README
+24fb099 chore: merge main into release [skip ci]
+651f79e Bump microsphere-spring-cloud to 0.2.26
+410ea23 chore: merge main into release [skip ci]
+ddecc79 Merge pull request #78 from microsphere-projects/dependabot/maven/org.apache.maven-apache-maven-3.9.16
+9297aa4 Bump org.apache.maven:apache-maven from 3.9.15 to 3.9.16
+265359e chore: merge release into main [skip ci]
+5247298 chore: bump version to next patch after publishing 0.2.15
+8ba9c4f Bump org.mybatis:mybatis-spring from 4.0.0 to 4.1.0
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-mybatis/compare/0.2.15...0.2.16
