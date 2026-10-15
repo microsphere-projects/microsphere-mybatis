@@ -128,6 +128,14 @@ We welcome your contributions! Please read [Code of Conduct](./CODE_OF_CONDUCT.m
 
 ## Documentation
 
+### In-Repository Documentation
+
+| Guide | Description | English | 中文 |
+|-------|-------------|---------|------|
+| Docs Home | Navigation for both guides and both version lines | [docs/README.md](docs/README.md) | [docs/zh/README.md](docs/zh/README.md) |
+| User Guide | Per-module API reference, code examples, version compatibility (`current` = `release` / 0.2.x, `1.x` = `release-1.x` / 0.1.x) | [docs/user-guide/README.md](docs/user-guide/README.md) | [docs/user-guide/zh/README.md](docs/user-guide/zh/README.md) |
+| Developer Guide | Architecture design, source analysis, design patterns, and Mermaid flow diagrams | [docs/developer-guide/README.md](docs/developer-guide/README.md) | [docs/developer-guide/zh/README.md](docs/developer-guide/zh/README.md) |
+
 ### User Guide
 
 [DeepWiki Host](https://deepwiki.com/microsphere-projects/microsphere-mybatis)
